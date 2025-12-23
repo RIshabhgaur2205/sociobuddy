@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Heart, ArrowLeft, LogOut, Check, Save } from "lucide-react";
+import { ArrowLeft, LogOut, Check, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import AvatarUpload from "@/components/profile/AvatarUpload";
 
 const INTERESTS = [
   "Gaming", "Music", "Sports", "Art", "Reading", "Movies", "Anime",
@@ -21,6 +22,7 @@ const Profile = () => {
   const [bio, setBio] = useState("");
   const [school, setSchool] = useState("");
   const [age, setAge] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +57,7 @@ const Profile = () => {
         setBio(data.bio || "");
         setSchool(data.school || "");
         setAge(data.age?.toString() || "");
+        setAvatarUrl(data.avatar_url);
         setSelectedInterests(data.interests || []);
       }
     } catch (err) {
@@ -142,10 +145,21 @@ const Profile = () => {
         <main className="container mx-auto px-4 py-8 max-w-xl">
           {/* Avatar */}
           <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-coral-light to-teal flex items-center justify-center text-primary-foreground text-4xl font-bold">
-              {username.charAt(0).toUpperCase()}
-            </div>
+            {user && (
+              <AvatarUpload
+                userId={user.id}
+                avatarUrl={avatarUrl}
+                username={username}
+                size="xl"
+                editable
+                onUploadComplete={setAvatarUrl}
+              />
+            )}
           </div>
+
+          <p className="text-center text-muted-foreground text-sm mb-8">
+            Tap the camera icon to change your photo
+          </p>
 
           <div className="space-y-6">
             <div className="space-y-2">
