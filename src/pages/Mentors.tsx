@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star, Clock, CheckCircle, GraduationCap } from "lucide-react";
+import { BookingDialog } from "@/components/mentors/BookingDialog";
 
 interface Mentor {
   id: string;
@@ -30,7 +31,7 @@ const mentors: Mentor[] = [
     specialties: ["Social Anxiety", "Confidence Building", "Teen Development"],
     rating: 4.9,
     reviews: 156,
-    costPerSession: 45,
+    costPerSession: 0,
     availability: "Mon-Fri",
     bio: "Specialized in helping teenagers overcome social challenges and build lasting confidence.",
     verified: true,
@@ -44,7 +45,7 @@ const mentors: Mentor[] = [
     specialties: ["Communication Skills", "Friendship Building", "Self-Expression"],
     rating: 4.8,
     reviews: 98,
-    costPerSession: 35,
+    costPerSession: 0,
     availability: "Weekends",
     bio: "Former shy teen who now helps others find their voice and build meaningful connections.",
     verified: true,
@@ -58,7 +59,7 @@ const mentors: Mentor[] = [
     specialties: ["Academic Stress", "Social Skills", "Group Dynamics"],
     rating: 4.9,
     reviews: 203,
-    costPerSession: 40,
+    costPerSession: 0,
     availability: "Mon-Sat",
     bio: "Dedicated to helping students thrive both academically and socially in school environments.",
     verified: true,
@@ -72,7 +73,7 @@ const mentors: Mentor[] = [
     specialties: ["Goal Setting", "Motivation", "Leadership Skills"],
     rating: 4.7,
     reviews: 67,
-    costPerSession: 30,
+    costPerSession: 0,
     availability: "Flexible",
     bio: "Empowering teens to discover their potential and achieve their personal goals.",
     verified: true,
@@ -86,7 +87,7 @@ const mentors: Mentor[] = [
     specialties: ["Mental Health", "Emotional Intelligence", "Family Dynamics"],
     rating: 5.0,
     reviews: 289,
-    costPerSession: 60,
+    costPerSession: 0,
     availability: "By Appointment",
     bio: "Expert in adolescent psychology with a focus on emotional wellbeing and healthy relationships.",
     verified: true,
@@ -100,7 +101,7 @@ const mentors: Mentor[] = [
     specialties: ["Career Guidance", "Study Skills", "Time Management"],
     rating: 4.6,
     reviews: 45,
-    costPerSession: 25,
+    costPerSession: 0,
     availability: "Evenings",
     bio: "Young mentor who relates to teen challenges and provides practical, real-world advice.",
     verified: true,
@@ -109,12 +110,19 @@ const mentors: Mentor[] = [
 
 const Mentors = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   const allSpecialties = [...new Set(mentors.flatMap(m => m.specialties))];
 
   const filteredMentors = selectedSpecialty
     ? mentors.filter(m => m.specialties.includes(selectedSpecialty))
     : mentors;
+
+  const handleBookSession = (mentor: Mentor) => {
+    setSelectedMentor(mentor);
+    setBookingOpen(true);
+  };
 
   return (
     <>
@@ -216,7 +224,7 @@ const Mentors = () => {
                       {mentor.experience} exp.
                     </div>
                     <div className="font-bold text-primary">
-                      ${mentor.costPerSession}/session
+                      FREE
                     </div>
                   </div>
 
@@ -234,7 +242,7 @@ const Mentors = () => {
                     <span className="text-xs text-muted-foreground">
                       Available: {mentor.availability}
                     </span>
-                    <Button size="sm">Book Session</Button>
+                    <Button size="sm" onClick={() => handleBookSession(mentor)}>Book Session</Button>
                   </div>
                 </div>
               </div>
@@ -250,6 +258,14 @@ const Mentors = () => {
             </div>
           )}
         </main>
+
+        {selectedMentor && (
+          <BookingDialog
+            open={bookingOpen}
+            onOpenChange={setBookingOpen}
+            mentor={selectedMentor}
+          />
+        )}
       </div>
     </>
   );
