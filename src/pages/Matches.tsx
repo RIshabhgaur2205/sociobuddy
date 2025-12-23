@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Check, X, ArrowLeft, User, Sparkles } from "lucide-react";
+import { MessageCircle, Check, X, ArrowLeft, User, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ interface MatchWithProfile {
     bio: string | null;
     school: string | null;
     interests: string[];
+    avatar_url: string | null;
   } | null;
 }
 
@@ -49,7 +50,7 @@ const Matches = () => {
       // Fetch pending matches where current user is user2 (received requests)
       const { data: pending, error: pendingError } = await supabase
         .from("matches")
-        .select("*, profile:profiles!matches_user1_id_fkey(id, username, bio, school, interests)")
+        .select("*, profile:profiles!matches_user1_id_fkey(id, username, bio, school, interests, avatar_url)")
         .eq("user2_id", user.id)
         .eq("status", "pending");
 
@@ -70,7 +71,7 @@ const Matches = () => {
           const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
           const { data: profile } = await supabase
             .from("profiles")
-            .select("id, username, bio, school, interests")
+            .select("id, username, bio, school, interests, avatar_url")
             .eq("id", otherUserId)
             .single();
 
@@ -130,6 +131,22 @@ const Matches = () => {
     );
   }
 
+  const renderAvatar = (profile: MatchWithProfile["profile"]) => {
+    if (!profile) return null;
+    
+    return profile.avatar_url ? (
+      <img
+        src={profile.avatar_url}
+        alt={profile.username}
+        className="w-14 h-14 rounded-full object-cover"
+      />
+    ) : (
+      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-coral-light to-teal flex items-center justify-center text-primary-foreground font-bold text-xl">
+        {profile.username.charAt(0).toUpperCase()}
+      </div>
+    );
+  };
+
   return (
     <>
       <Helmet>
@@ -186,7 +203,7 @@ const Matches = () => {
               {pendingMatches.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 rounded-full bg-mint mx-auto flex items-center justify-center mb-4">
-                    <Heart className="h-8 w-8 text-teal" />
+                    <MessageCircle className="h-8 w-8 text-teal" />
                   </div>
                   <h3 className="font-semibold mb-2">No Pending Requests</h3>
                   <p className="text-muted-foreground">
@@ -199,9 +216,7 @@ const Matches = () => {
                     key={match.id}
                     className="bg-card rounded-2xl p-4 shadow-card flex items-center gap-4"
                   >
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-coral-light to-teal flex items-center justify-center text-primary-foreground font-bold text-xl">
-                      {match.profile?.username.charAt(0).toUpperCase()}
-                    </div>
+                    {renderAvatar(match.profile)}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold truncate">{match.profile?.username}</h3>
                       <p className="text-sm text-muted-foreground truncate">
@@ -253,9 +268,7 @@ const Matches = () => {
                     key={match.id}
                     className="bg-card rounded-2xl p-4 shadow-card flex items-center gap-4"
                   >
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-coral-light to-teal flex items-center justify-center text-primary-foreground font-bold text-xl">
-                      {match.profile?.username.charAt(0).toUpperCase()}
-                    </div>
+                    {renderAvatar(match.profile)}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold truncate">{match.profile?.username}</h3>
                       <p className="text-sm text-muted-foreground truncate">

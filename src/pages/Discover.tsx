@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, X, MessageCircle, Sparkles, ArrowLeft, User } from "lucide-react";
+import { Heart, X, MessageCircle, Sparkles, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ interface Profile {
   age: number | null;
   interests: string[];
   looking_for: string | null;
+  avatar_url: string | null;
 }
 
 const Discover = () => {
@@ -52,7 +53,7 @@ const Discover = () => {
       // Fetch profiles excluding current user and already matched
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, bio, school, age, interests, looking_for")
+        .select("id, username, bio, school, age, interests, looking_for, avatar_url")
         .eq("is_visible", true)
         .not("id", "in", `(${excludeIds.join(",")})`)
         .limit(20);
@@ -190,10 +191,18 @@ const Discover = () => {
               {/* Profile Card */}
               <div className="bg-card rounded-3xl shadow-card overflow-hidden">
                 {/* Avatar */}
-                <div className="h-48 gradient-hero flex items-center justify-center">
-                  <div className="w-24 h-24 rounded-full bg-card flex items-center justify-center text-4xl font-bold text-primary">
-                    {currentProfile.username.charAt(0).toUpperCase()}
-                  </div>
+                <div className="h-64 gradient-hero flex items-center justify-center relative">
+                  {currentProfile.avatar_url ? (
+                    <img
+                      src={currentProfile.avatar_url}
+                      alt={`${currentProfile.username}'s profile`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-card flex items-center justify-center text-5xl font-bold text-primary">
+                      {currentProfile.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}
