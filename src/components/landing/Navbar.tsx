@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, MessageCircle, User, LogOut } from "lucide-react";
+import { Heart, Menu, X, MessageCircle, User, LogOut, GraduationCap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ChatBox from "@/components/chat/ChatBox";
@@ -42,6 +42,10 @@ const Navbar = () => {
               <a href="/#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
                 Stories
               </a>
+              <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
+                <GraduationCap className="h-4 w-4" />
+                Mentors
+              </Link>
               <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
                 <MessageCircle className="h-4 w-4" />
                 Chat
@@ -125,6 +129,10 @@ const Navbar = () => {
                 <a href="/#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
                   Stories
                 </a>
+                <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  Mentors
+                </Link>
                 <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
                   Community Chat

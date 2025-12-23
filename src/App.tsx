@@ -14,6 +14,7 @@ import Matches from "./pages/Matches";
 import Profile from "./pages/Profile";
 import Chat from "./pages/Chat";
 import Conversation from "./pages/Conversation";
+import Mentors from "./pages/Mentors";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/conversation/:matchId" element={<Conversation />} />
+              <Route path="/mentors" element={<Mentors />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

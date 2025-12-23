@@ -1,4 +1,4 @@
-import { Shield, Zap, Globe, MessageSquare, Calendar, Trophy } from "lucide-react";
+import { Shield, Zap, Globe, MessageSquare, GraduationCap, Trophy } from "lucide-react";
 
 const features = [
   {
@@ -20,15 +20,15 @@ const features = [
     gradient: "from-sunshine to-accent",
   },
   {
-    icon: MessageSquare,
-    title: "Ice Breakers",
-    description: "Not sure what to say? Our fun conversation starters make chatting easy and stress-free.",
+    icon: GraduationCap,
+    title: "Expert Mentorship",
+    description: "Connect with verified mentors who can guide you in building confidence and social skills.",
     gradient: "from-lavender to-coral-light",
   },
   {
-    icon: Calendar,
-    title: "Group Activities",
-    description: "Join virtual hangouts, study groups, and fun activities to build confidence gradually.",
+    icon: MessageSquare,
+    title: "Ice Breakers",
+    description: "Not sure what to say? Our fun conversation starters make chatting easy and stress-free.",
     gradient: "from-mint to-teal",
   },
   {
