@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, Menu, X, MessageCircle, User, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import ChatBox from "@/components/chat/ChatBox";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   return (
     <>
@@ -49,8 +59,37 @@ const Navbar = () => {
                 <MessageCircle className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full animate-pulse" />
               </Button>
-              <Button variant="ghost">Log In</Button>
-              <Button>Join Now</Button>
+
+              {user ? (
+                <>
+                  <Link to="/discover">
+                    <Button variant="ghost">Discover</Button>
+                  </Link>
+                  <Link to="/matches">
+                    <Button variant="ghost">
+                      <Heart className="h-4 w-4 mr-1" />
+                      Matches
+                    </Button>
+                  </Link>
+                  <Link to="/profile">
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth">
+                    <Button variant="ghost">Log In</Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button>Join Now</Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -90,10 +129,35 @@ const Navbar = () => {
                   <MessageCircle className="h-4 w-4" />
                   Community Chat
                 </Link>
-                <div className="flex gap-4 pt-4 border-t border-border/50">
-                  <Button variant="ghost" className="flex-1">Log In</Button>
-                  <Button className="flex-1">Join Now</Button>
-                </div>
+
+                {user ? (
+                  <>
+                    <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                      Discover
+                    </Link>
+                    <Link to="/matches" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                      My Matches
+                    </Link>
+                    <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                      Profile
+                    </Link>
+                    <div className="pt-4 border-t border-border/50">
+                      <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex gap-4 pt-4 border-t border-border/50">
+                    <Link to="/auth" className="flex-1">
+                      <Button variant="ghost" className="w-full">Log In</Button>
+                    </Link>
+                    <Link to="/auth" className="flex-1">
+                      <Button className="w-full">Join Now</Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           )}
