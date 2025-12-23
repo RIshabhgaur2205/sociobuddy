@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Users, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-illustration.png";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const scrollToHowItWorks = () => {
+    const element = document.getElementById("how-it-works");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   return (
     <section className="relative min-h-screen overflow-hidden bg-background">
       {/* Decorative blobs */}
@@ -31,11 +40,11 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="xl">
+              <Button variant="hero" size="xl" onClick={() => navigate("/auth")}>
                 <Heart className="h-5 w-5" />
                 Join SocioBuddy
               </Button>
-              <Button variant="hero-outline" size="xl">
+              <Button variant="hero-outline" size="xl" onClick={scrollToHowItWorks}>
                 <Users className="h-5 w-5" />
                 See How It Works
               </Button>
