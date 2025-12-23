@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AvatarUpload from "@/components/profile/AvatarUpload";
+import SubscriptionCard from "@/components/profile/SubscriptionCard";
 
 const INTERESTS = [
   "Gaming", "Music", "Sports", "Art", "Reading", "Movies", "Anime",
@@ -160,6 +161,11 @@ const Profile = () => {
           <p className="text-center text-muted-foreground text-sm mb-8">
             Tap the camera icon to change your photo
           </p>
+
+          {/* Subscription Section */}
+          <div className="mb-8">
+            <SubscriptionCard />
+          </div>
 
           <div className="space-y-6">
             <div className="space-y-2">
