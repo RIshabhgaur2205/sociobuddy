@@ -287,7 +287,7 @@ const Matches = () => {
                         </div>
                       )}
                     </div>
-                    <Link to="/chat">
+                    <Link to={`/conversation/${match.id}`}>
                       <Button size="sm" variant="secondary">
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Chat
