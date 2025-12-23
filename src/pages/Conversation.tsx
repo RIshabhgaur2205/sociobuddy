@@ -116,16 +116,29 @@ const Conversation = () => {
     if (!newMessage.trim() || !user || !matchId || sending) return;
 
     setSending(true);
+    const messageContent = newMessage.trim();
     const { error } = await supabase.from("messages").insert({
       match_id: matchId,
       sender_id: user.id,
-      content: newMessage.trim(),
+      content: messageContent,
     });
 
     if (error) {
       toast({ title: "Failed to send message", variant: "destructive" });
     } else {
       setNewMessage("");
+      
+      // Send push notification to the other user (fire and forget)
+      if (matchedProfile) {
+        supabase.functions.invoke("send-push-notification", {
+          body: {
+            userId: matchedProfile.id,
+            title: "New message",
+            body: messageContent.substring(0, 100),
+            url: `/conversation/${matchId}`,
+          },
+        }).catch(console.error);
+      }
     }
     setSending(false);
   };
