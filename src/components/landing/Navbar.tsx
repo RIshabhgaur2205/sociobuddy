@@ -46,6 +46,9 @@ const Navbar = () => {
                 <GraduationCap className="h-4 w-4" />
                 Mentors
               </Link>
+              <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+                Pricing
+              </Link>
               <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
                 <MessageCircle className="h-4 w-4" />
                 Chat
@@ -132,6 +135,9 @@ const Navbar = () => {
                 <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
                   <GraduationCap className="h-4 w-4" />
                   Mentors
+                </Link>
+                <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                  Pricing
                 </Link>
                 <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
