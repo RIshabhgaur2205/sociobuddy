@@ -23,6 +23,7 @@ const Discover = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [matchCount, setMatchCount] = useState(0);
+  const [myProfile, setMyProfile] = useState<Profile | null>(null);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
@@ -33,10 +34,30 @@ const Discover = () => {
     }
 
     if (user) {
-      fetchProfiles();
+      fetchMyProfile();
       fetchMatchCount();
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (myProfile) {
+      fetchProfiles();
+    }
+  }, [myProfile]);
+
+  const fetchMyProfile = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, username, bio, school, age, interests, looking_for, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!error && data) {
+      setMyProfile(data);
+    }
+  };
 
   const fetchProfiles = async () => {
     if (!user) return;
@@ -80,10 +101,69 @@ const Discover = () => {
     setMatchCount(count || 0);
   };
 
-  const calculateCompatibility = (profile: Profile): number => {
-    // Simple compatibility based on shared interests
-    // In a real app, this would be more sophisticated
-    return Math.floor(Math.random() * 30) + 70; // 70-100%
+  const calculateCompatibility = (otherProfile: Profile): number => {
+    if (!myProfile) return 50;
+
+    let score = 0;
+    let maxScore = 0;
+
+    // 1. Shared interests (up to 50 points)
+    const myInterests = myProfile.interests || [];
+    const theirInterests = otherProfile.interests || [];
+    const sharedInterests = myInterests.filter(i => theirInterests.includes(i));
+    
+    if (myInterests.length > 0 || theirInterests.length > 0) {
+      const totalUniqueInterests = new Set([...myInterests, ...theirInterests]).size;
+      const interestScore = totalUniqueInterests > 0 
+        ? (sharedInterests.length / totalUniqueInterests) * 50 
+        : 0;
+      score += interestScore;
+      maxScore += 50;
+    }
+
+    // 2. School match (25 points for same school)
+    if (myProfile.school && otherProfile.school) {
+      const mySchoolLower = myProfile.school.toLowerCase().trim();
+      const theirSchoolLower = otherProfile.school.toLowerCase().trim();
+      
+      if (mySchoolLower === theirSchoolLower) {
+        score += 25; // Exact match
+      } else if (mySchoolLower.includes(theirSchoolLower) || theirSchoolLower.includes(mySchoolLower)) {
+        score += 15; // Partial match
+      }
+      maxScore += 25;
+    }
+
+    // 3. Age similarity (up to 25 points)
+    if (myProfile.age && otherProfile.age) {
+      const ageDiff = Math.abs(myProfile.age - otherProfile.age);
+      if (ageDiff === 0) {
+        score += 25;
+      } else if (ageDiff === 1) {
+        score += 20;
+      } else if (ageDiff === 2) {
+        score += 15;
+      } else if (ageDiff <= 4) {
+        score += 10;
+      } else if (ageDiff <= 6) {
+        score += 5;
+      }
+      maxScore += 25;
+    }
+
+    // 4. Looking for compatibility (bonus points)
+    if (myProfile.looking_for && otherProfile.looking_for) {
+      if (myProfile.looking_for === otherProfile.looking_for) {
+        score += 10;
+      }
+      maxScore += 10;
+    }
+
+    // Calculate final percentage (minimum 30%, maximum 99%)
+    if (maxScore === 0) return 50;
+    
+    const percentage = Math.round((score / maxScore) * 100);
+    return Math.max(30, Math.min(99, percentage));
   };
 
   const handleLike = async (profileId: string) => {
