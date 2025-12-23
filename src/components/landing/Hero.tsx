@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, Users, Sparkles, Download } from "lucide-react";
+import { Heart, Users, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-illustration.png";
 
 const Hero = () => {
@@ -39,17 +39,6 @@ const Hero = () => {
                 <Users className="h-5 w-5" />
                 See How It Works
               </Button>
-            </div>
-            
-            <div className="flex items-center gap-4 pt-2">
-              <a 
-                href="/sociobuddy.apk" 
-                download
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal to-coral px-6 py-3 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
-              >
-                <Download className="h-5 w-5" />
-                Download Android App
-              </a>
             </div>
             
             <div className="flex items-center gap-6 pt-4">
