@@ -90,16 +90,28 @@ const Discover = () => {
     if (!user) return;
 
     try {
+      const compatibilityScore = calculateCompatibility(profiles[currentIndex]);
       const { error } = await supabase.from("matches").insert({
         user1_id: user.id,
         user2_id: profileId,
         status: "pending",
-        compatibility_score: calculateCompatibility(profiles[currentIndex]),
+        compatibility_score: compatibilityScore,
       });
 
       if (error) throw error;
 
       toast.success("Connection request sent!");
+      
+      // Send push notification to the liked user (fire and forget)
+      supabase.functions.invoke("send-push-notification", {
+        body: {
+          userId: profileId,
+          title: "New connection request!",
+          body: "Someone wants to connect with you 💜",
+          url: "/matches",
+        },
+      }).catch(console.error);
+      
       nextProfile();
     } catch (err) {
       console.error("Error creating match:", err);

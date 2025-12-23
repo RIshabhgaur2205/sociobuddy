@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationPrompt } from "./components/notifications/NotificationPrompt";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -24,6 +25,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <NotificationPrompt />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
