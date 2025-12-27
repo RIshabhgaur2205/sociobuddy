@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heart, Mail, Lock, User, ArrowLeft, Sparkles } from "lucide-react";
+import { Heart, Mail, Lock, User, ArrowLeft, Sparkles, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
@@ -13,6 +13,7 @@ const signUpSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be less than 20 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  referralCode: z.string().optional(),
 });
 
 const signInSchema = z.object({
@@ -25,6 +26,7 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
@@ -35,14 +37,14 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const validation = signUpSchema.safeParse({ username, email, password });
+        const validation = signUpSchema.safeParse({ username, email, password, referralCode });
         if (!validation.success) {
           toast.error(validation.error.errors[0].message);
           setIsLoading(false);
           return;
         }
 
-        const { error } = await signUp(email, password, username);
+        const { error } = await signUp(email, password, username, referralCode.trim() || undefined);
         if (error) {
           if (error.message.includes("already registered")) {
             toast.error("This email is already registered. Try signing in instead.");
@@ -155,6 +157,23 @@ const Auth = () => {
                   />
                 </div>
               </div>
+
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="referralCode">Referral Code (Optional)</Label>
+                  <div className="relative">
+                    <Gift className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="referralCode"
+                      placeholder="Enter referral code"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value)}
+                      className="pl-10"
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+              )}
 
               <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
                 {isLoading ? "Please wait..." : isSignUp ? "Create Account" : "Log In"}

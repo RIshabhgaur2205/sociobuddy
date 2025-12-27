@@ -303,6 +303,39 @@ export type Database = {
           },
         ]
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          current_uses: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          current_uses?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          current_uses?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           created_at: string

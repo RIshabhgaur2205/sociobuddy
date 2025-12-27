@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, username: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, username: string, referralCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -46,10 +46,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, username: string) => {
+  const signUp = async (email: string, password: string, username: string, referralCode?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -59,6 +59,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       },
     });
+
+    // If signup successful and referral code provided, validate it
+    if (!error && data.user && referralCode) {
+      try {
+        const response = await supabase.functions.invoke('validate-referral', {
+          body: { userId: data.user.id, referralCode }
+        });
+        
+        if (response.data?.success && response.data?.role) {
+          console.log('Referral code applied successfully, role:', response.data.role);
+        } else if (response.data?.error) {
+          console.log('Referral code validation failed:', response.data.error);
+        }
+      } catch (err) {
+        console.log('Error validating referral code:', err);
+      }
+    }
 
     return { error };
   };
