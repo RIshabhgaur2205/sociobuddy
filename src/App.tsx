@@ -18,6 +18,7 @@ import Mentors from "./pages/Mentors";
 import Pricing from "./pages/Pricing";
 import AdminMentors from "./pages/AdminMentors";
 import AdminUsers from "./pages/AdminUsers";
+import AdminReferralCodes from "./pages/AdminReferralCodes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/admin/mentors" element={<AdminMentors />} />
               <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/referral-codes" element={<AdminReferralCodes />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

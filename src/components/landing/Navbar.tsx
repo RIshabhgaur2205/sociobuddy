@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, MessageCircle, User, LogOut, GraduationCap, Shield } from "lucide-react";
+import { Heart, Menu, X, MessageCircle, User, LogOut, GraduationCap, Shield, Gift } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
@@ -115,6 +115,12 @@ const Navbar = () => {
                             User Management
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/referral-codes" className="cursor-pointer">
+                            <Gift className="h-4 w-4 mr-2" />
+                            Referral Codes
+                          </Link>
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
@@ -203,6 +209,9 @@ const Navbar = () => {
                         </Link>
                         <Link to="/admin/users" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
                           User Management
+                        </Link>
+                        <Link to="/admin/referral-codes" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                          Referral Codes
                         </Link>
                       </>
                     )}
