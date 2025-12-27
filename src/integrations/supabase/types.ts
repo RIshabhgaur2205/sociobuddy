@@ -119,6 +119,63 @@ export type Database = {
         }
         Relationships: []
       }
+      mentors: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          created_at: string
+          email: string
+          experience: string | null
+          id: string
+          name: string
+          photo: string | null
+          rating: number | null
+          reviews_count: number | null
+          specialties: string[] | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          email: string
+          experience?: string | null
+          id?: string
+          name: string
+          photo?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string
+          experience?: string | null
+          id?: string
+          name?: string
+          photo?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
