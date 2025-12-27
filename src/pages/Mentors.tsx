@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Star, Clock, CheckCircle, GraduationCap } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Star, Clock, CheckCircle, GraduationCap, UserPlus, LayoutDashboard, Loader2 } from "lucide-react";
 import { BookingDialog } from "@/components/mentors/BookingDialog";
+import { MentorSignupDialog } from "@/components/mentors/MentorSignupDialog";
+import { MentorDashboard } from "@/components/mentors/MentorDashboard";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface Mentor {
   id: string;
@@ -21,7 +27,25 @@ interface Mentor {
   verified: boolean;
 }
 
-const mentors: Mentor[] = [
+interface DbMentor {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string;
+  photo: string | null;
+  title: string;
+  experience: string | null;
+  specialties: string[] | null;
+  bio: string | null;
+  availability: string | null;
+  status: string;
+  verified: boolean;
+  rating: number;
+  reviews_count: number;
+}
+
+// Sample mentors (fallback)
+const sampleMentors: Mentor[] = [
   {
     id: "1",
     name: "Dr. Sarah Chen",
@@ -109,20 +133,63 @@ const mentors: Mentor[] = [
 ];
 
 const Mentors = () => {
+  const { user } = useAuth();
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [userMentorStatus, setUserMentorStatus] = useState<DbMentor | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("find");
 
-  const allSpecialties = [...new Set(mentors.flatMap(m => m.specialties))];
+  // Fetch user's mentor status
+  useEffect(() => {
+    const fetchMentorStatus = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("mentors")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setUserMentorStatus(data as DbMentor);
+      }
+      setLoading(false);
+    };
+
+    fetchMentorStatus();
+  }, [user]);
+
+  const allSpecialties = [...new Set(sampleMentors.flatMap(m => m.specialties))];
 
   const filteredMentors = selectedSpecialty
-    ? mentors.filter(m => m.specialties.includes(selectedSpecialty))
-    : mentors;
+    ? sampleMentors.filter(m => m.specialties.includes(selectedSpecialty))
+    : sampleMentors;
 
   const handleBookSession = (mentor: Mentor) => {
     setSelectedMentor(mentor);
     setBookingOpen(true);
   };
+
+  const handleBecomeMentor = () => {
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to apply as a mentor.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSignupOpen(true);
+  };
+
+  const isApprovedMentor = userMentorStatus?.status === "approved";
+  const isPendingMentor = userMentorStatus?.status === "pending";
 
   return (
     <>
@@ -147,115 +214,65 @@ const Mentors = () => {
                 <p className="text-sm text-muted-foreground">Verified experts to guide you</p>
               </div>
             </div>
+            
+            {/* Become a Mentor Button */}
+            {!loading && !isApprovedMentor && !isPendingMentor && (
+              <Button onClick={handleBecomeMentor} variant="outline" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Become a Mentor
+              </Button>
+            )}
+            {isPendingMentor && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Application Pending
+              </Badge>
+            )}
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Filter by Specialty */}
-          <div className="mb-8">
-            <h2 className="text-sm font-medium text-muted-foreground mb-3">Filter by specialty:</h2>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={selectedSpecialty === null ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedSpecialty(null)}
-              >
-                All
-              </Button>
-              {allSpecialties.map((specialty) => (
-                <Button
-                  key={specialty}
-                  variant={selectedSpecialty === specialty ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedSpecialty(specialty)}
-                >
-                  {specialty}
-                </Button>
-              ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          </div>
+          ) : isApprovedMentor ? (
+            // Show tabs for approved mentors
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger value="find" className="flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  Find Mentors
+                </TabsTrigger>
+                <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                  <LayoutDashboard className="h-4 w-4" />
+                  My Dashboard
+                </TabsTrigger>
+              </TabsList>
 
-          {/* Mentors Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMentors.map((mentor) => (
-              <div
-                key={mentor.id}
-                className="bg-card rounded-2xl shadow-card overflow-hidden hover:shadow-glow transition-all duration-300 hover:-translate-y-1"
-              >
-                {/* Mentor Photo */}
-                <div className="relative h-48 bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <img
-                    src={mentor.photo}
-                    alt={mentor.name}
-                    className="w-full h-full object-cover"
-                  />
-                  {mentor.verified && (
-                    <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3" />
-                      Verified
-                    </div>
-                  )}
-                </div>
+              <TabsContent value="find">
+                <MentorsList
+                  mentors={filteredMentors}
+                  allSpecialties={allSpecialties}
+                  selectedSpecialty={selectedSpecialty}
+                  setSelectedSpecialty={setSelectedSpecialty}
+                  handleBookSession={handleBookSession}
+                />
+              </TabsContent>
 
-                {/* Mentor Info */}
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-bold text-lg">{mentor.name}</h3>
-                      <p className="text-sm text-muted-foreground">{mentor.title}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-amber-500">
-                        <Star className="h-4 w-4 fill-current" />
-                        <span className="font-semibold">{mentor.rating}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{mentor.reviews} reviews</p>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {mentor.bio}
-                  </p>
-
-                  {/* Experience & Cost */}
-                  <div className="flex items-center justify-between mb-4 text-sm">
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      {mentor.experience} exp.
-                    </div>
-                    <div className="font-bold text-primary">
-                      FREE
-                    </div>
-                  </div>
-
-                  {/* Specialties */}
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {mentor.specialties.slice(0, 3).map((specialty) => (
-                      <Badge key={specialty} variant="secondary" className="text-xs">
-                        {specialty}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  {/* Availability */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Available: {mentor.availability}
-                    </span>
-                    <Button size="sm" onClick={() => handleBookSession(mentor)}>Book Session</Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredMentors.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No mentors found for this specialty.</p>
-              <Button variant="outline" className="mt-4" onClick={() => setSelectedSpecialty(null)}>
-                View All Mentors
-              </Button>
-            </div>
+              <TabsContent value="dashboard">
+                <MentorDashboard mentorId={userMentorStatus!.id} />
+              </TabsContent>
+            </Tabs>
+          ) : (
+            // Regular mentors list for non-mentors
+            <MentorsList
+              mentors={filteredMentors}
+              allSpecialties={allSpecialties}
+              selectedSpecialty={selectedSpecialty}
+              setSelectedSpecialty={setSelectedSpecialty}
+              handleBookSession={handleBookSession}
+            />
           )}
         </main>
 
@@ -266,7 +283,146 @@ const Mentors = () => {
             mentor={selectedMentor}
           />
         )}
+
+        <MentorSignupDialog
+          open={signupOpen}
+          onOpenChange={setSignupOpen}
+          onSuccess={() => {
+            setUserMentorStatus({
+              ...userMentorStatus!,
+              status: "pending",
+            } as DbMentor);
+          }}
+        />
       </div>
+    </>
+  );
+};
+
+// Extracted MentorsList component
+interface MentorsListProps {
+  mentors: Mentor[];
+  allSpecialties: string[];
+  selectedSpecialty: string | null;
+  setSelectedSpecialty: (specialty: string | null) => void;
+  handleBookSession: (mentor: Mentor) => void;
+}
+
+const MentorsList = ({
+  mentors,
+  allSpecialties,
+  selectedSpecialty,
+  setSelectedSpecialty,
+  handleBookSession,
+}: MentorsListProps) => {
+  return (
+    <>
+      {/* Filter by Specialty */}
+      <div className="mb-8">
+        <h2 className="text-sm font-medium text-muted-foreground mb-3">Filter by specialty:</h2>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={selectedSpecialty === null ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedSpecialty(null)}
+          >
+            All
+          </Button>
+          {allSpecialties.map((specialty) => (
+            <Button
+              key={specialty}
+              variant={selectedSpecialty === specialty ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedSpecialty(specialty)}
+            >
+              {specialty}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Mentors Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {mentors.map((mentor) => (
+          <div
+            key={mentor.id}
+            className="bg-card rounded-2xl shadow-card overflow-hidden hover:shadow-glow transition-all duration-300 hover:-translate-y-1"
+          >
+            {/* Mentor Photo */}
+            <div className="relative h-48 bg-gradient-to-br from-primary/20 to-secondary/20">
+              <img
+                src={mentor.photo}
+                alt={mentor.name}
+                className="w-full h-full object-cover"
+              />
+              {mentor.verified && (
+                <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Verified
+                </div>
+              )}
+            </div>
+
+            {/* Mentor Info */}
+            <div className="p-5">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="font-bold text-lg">{mentor.name}</h3>
+                  <p className="text-sm text-muted-foreground">{mentor.title}</p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-amber-500">
+                    <Star className="h-4 w-4 fill-current" />
+                    <span className="font-semibold">{mentor.rating}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{mentor.reviews} reviews</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                {mentor.bio}
+              </p>
+
+              {/* Experience & Cost */}
+              <div className="flex items-center justify-between mb-4 text-sm">
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  {mentor.experience} exp.
+                </div>
+                <div className="font-bold text-primary">
+                  FREE
+                </div>
+              </div>
+
+              {/* Specialties */}
+              <div className="flex flex-wrap gap-1 mb-4">
+                {mentor.specialties.slice(0, 3).map((specialty) => (
+                  <Badge key={specialty} variant="secondary" className="text-xs">
+                    {specialty}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Availability */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Available: {mentor.availability}
+                </span>
+                <Button size="sm" onClick={() => handleBookSession(mentor)}>Book Session</Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {mentors.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No mentors found for this specialty.</p>
+          <Button variant="outline" className="mt-4" onClick={() => setSelectedSpecialty(null)}>
+            View All Mentors
+          </Button>
+        </div>
+      )}
     </>
   );
 };
