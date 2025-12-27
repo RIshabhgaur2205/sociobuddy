@@ -1,15 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, MessageCircle, User, LogOut, GraduationCap } from "lucide-react";
+import { Heart, Menu, X, MessageCircle, User, LogOut, GraduationCap, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import ChatBox from "@/components/chat/ChatBox";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -83,6 +93,31 @@ const Navbar = () => {
                       <User className="h-5 w-5" />
                     </Button>
                   </Link>
+                  {isAdmin && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-primary">
+                          <Shield className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Admin Panel</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/mentors" className="cursor-pointer">
+                            <GraduationCap className="h-4 w-4 mr-2" />
+                            Mentor Applications
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/users" className="cursor-pointer">
+                            <User className="h-4 w-4 mr-2" />
+                            User Management
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <Button variant="ghost" size="icon" onClick={handleSignOut}>
                     <LogOut className="h-5 w-5" />
                   </Button>
@@ -155,6 +190,22 @@ const Navbar = () => {
                     <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
                       Profile
                     </Link>
+                    {isAdmin && (
+                      <>
+                        <div className="pt-2 pb-1">
+                          <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                            <Shield className="h-3 w-3" />
+                            Admin
+                          </span>
+                        </div>
+                        <Link to="/admin/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                          Mentor Applications
+                        </Link>
+                        <Link to="/admin/users" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                          User Management
+                        </Link>
+                      </>
+                    )}
                     <div className="pt-4 border-t border-border/50">
                       <Button variant="outline" className="w-full" onClick={handleSignOut}>
                         <LogOut className="h-4 w-4 mr-2" />
