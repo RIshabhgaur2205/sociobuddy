@@ -141,35 +141,63 @@ const Mentors = () => {
   const [userMentorStatus, setUserMentorStatus] = useState<DbMentor | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("find");
+  const [approvedMentors, setApprovedMentors] = useState<Mentor[]>([]);
 
-  // Fetch user's mentor status
+  // Fetch approved mentors and user's mentor status
   useEffect(() => {
-    const fetchMentorStatus = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
+    const fetchData = async () => {
+      // Fetch approved mentors from database
+      const { data: mentorsData, error: mentorsError } = await supabase
         .from("mentors")
         .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        .eq("status", "approved");
 
-      if (!error && data) {
-        setUserMentorStatus(data as DbMentor);
+      if (!mentorsError && mentorsData) {
+        const dbMentors: Mentor[] = mentorsData.map((m: DbMentor) => ({
+          id: m.id,
+          name: m.name,
+          photo: m.photo || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+          title: m.title,
+          experience: m.experience || "N/A",
+          specialties: m.specialties || [],
+          rating: Number(m.rating) || 0,
+          reviews: m.reviews_count || 0,
+          costPerSession: 0,
+          availability: m.availability || "Flexible",
+          bio: m.bio || "",
+          verified: m.verified || false,
+        }));
+        
+        // Combine database mentors with sample mentors (db mentors first)
+        setApprovedMentors(dbMentors.length > 0 ? dbMentors : sampleMentors);
+      } else {
+        setApprovedMentors(sampleMentors);
       }
+
+      // Fetch user's mentor status if logged in
+      if (user) {
+        const { data, error } = await supabase
+          .from("mentors")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!error && data) {
+          setUserMentorStatus(data as DbMentor);
+        }
+      }
+      
       setLoading(false);
     };
 
-    fetchMentorStatus();
+    fetchData();
   }, [user]);
 
-  const allSpecialties = [...new Set(sampleMentors.flatMap(m => m.specialties))];
+  const allSpecialties = [...new Set(approvedMentors.flatMap(m => m.specialties))];
 
   const filteredMentors = selectedSpecialty
-    ? sampleMentors.filter(m => m.specialties.includes(selectedSpecialty))
-    : sampleMentors;
+    ? approvedMentors.filter(m => m.specialties.includes(selectedSpecialty))
+    : approvedMentors;
 
   const handleBookSession = (mentor: Mentor) => {
     setSelectedMentor(mentor);
