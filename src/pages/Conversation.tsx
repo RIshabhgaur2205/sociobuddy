@@ -51,6 +51,7 @@ const Conversation = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -198,6 +199,11 @@ const Conversation = () => {
         setNewMessage("");
         setSelectedImage(null);
         setImagePreview(null);
+        
+        // Keep focus on input to keep keyboard open on mobile
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 10);
 
         if (matchedProfile) {
           supabase.functions.invoke("send-push-notification", {
@@ -502,6 +508,7 @@ const Conversation = () => {
                 <Mic className="h-5 w-5" />
               </Button>
               <Input
+                ref={inputRef}
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
