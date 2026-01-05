@@ -12,7 +12,6 @@ import Onboarding from "./pages/Onboarding";
 import Discover from "./pages/Discover";
 import Matches from "./pages/Matches";
 import Profile from "./pages/Profile";
-import Chat from "./pages/Chat";
 import Conversation from "./pages/Conversation";
 import Mentors from "./pages/Mentors";
 import Pricing from "./pages/Pricing";
@@ -40,7 +39,6 @@ const App = () => (
               <Route path="/discover" element={<Discover />} />
               <Route path="/matches" element={<Matches />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/chat" element={<Chat />} />
               <Route path="/conversation/:matchId" element={<Conversation />} />
               <Route path="/mentors" element={<Mentors />} />
               <Route path="/pricing" element={<Pricing />} />
