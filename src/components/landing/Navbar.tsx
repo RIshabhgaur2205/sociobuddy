@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { toast } from "sonner";
+import logo from "@/assets/logo.jpeg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,9 +33,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-coral-light to-coral flex items-center justify-center">
-              <Heart className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="SocioBuddy Logo" className="w-10 h-10 rounded-xl object-cover" />
             <span className="text-xl font-extrabold text-foreground">SocioBuddy</span>
           </Link>
 

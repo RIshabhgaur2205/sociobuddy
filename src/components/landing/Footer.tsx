@@ -1,5 +1,6 @@
-import { Heart, Instagram, Youtube } from "lucide-react";
+import { Instagram, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.jpeg";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,9 +12,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-coral-light to-coral flex items-center justify-center">
-                <Heart className="h-5 w-5 text-foreground" />
-              </div>
+              <img src={logo} alt="SocioBuddy Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="text-xl font-extrabold">SocioBuddy</span>
             </Link>
             <p className="text-background/60 text-sm leading-relaxed">
