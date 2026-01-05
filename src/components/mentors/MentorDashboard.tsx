@@ -5,7 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar, Clock, Users, History, MessageSquare } from "lucide-react";
+import { Calendar, Clock, Users, History, MessageSquare, Video, Save, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface Booking {
   id: string;
@@ -29,12 +33,15 @@ export const MentorDashboard = ({ mentorId }: MentorDashboardProps) => {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gmeetLink, setGmeetLink] = useState("");
+  const [savingLink, setSavingLink] = useState(false);
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchData = async () => {
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Fetch bookings
+      const { data: bookingsData, error: bookingsError } = await supabase
         .from("mentor_bookings")
         .select(`
           *,
@@ -43,14 +50,41 @@ export const MentorDashboard = ({ mentorId }: MentorDashboardProps) => {
         .eq("mentor_id", mentorId)
         .order("booking_date", { ascending: true });
 
-      if (!error && data) {
-        setBookings(data as unknown as Booking[]);
+      if (!bookingsError && bookingsData) {
+        setBookings(bookingsData as unknown as Booking[]);
       }
+
+      // Fetch mentor's gmeet link
+      const { data: mentorData } = await supabase
+        .from("mentors")
+        .select("gmeet_link")
+        .eq("id", mentorId)
+        .single();
+
+      if (mentorData?.gmeet_link) {
+        setGmeetLink(mentorData.gmeet_link);
+      }
+
       setLoading(false);
     };
 
-    fetchBookings();
+    fetchData();
   }, [mentorId, user]);
+
+  const handleSaveGmeetLink = async () => {
+    setSavingLink(true);
+    const { error } = await supabase
+      .from("mentors")
+      .update({ gmeet_link: gmeetLink })
+      .eq("id", mentorId);
+
+    if (error) {
+      toast.error("Failed to save Google Meet link");
+    } else {
+      toast.success("Google Meet link saved successfully");
+    }
+    setSavingLink(false);
+  };
 
   const upcomingBookings = bookings.filter(
     (b) => !isPast(parseISO(b.booking_date)) || b.booking_date === format(new Date(), "yyyy-MM-dd")
@@ -91,6 +125,37 @@ export const MentorDashboard = ({ mentorId }: MentorDashboardProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Google Meet Link Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Video className="h-5 w-5 text-primary" />
+            Google Meet Link
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Provide your Google Meet link for sessions. This link will be shared with students who book sessions with you.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <Label htmlFor="gmeet-link" className="sr-only">Google Meet Link</Label>
+              <Input
+                id="gmeet-link"
+                type="url"
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                value={gmeetLink}
+                onChange={(e) => setGmeetLink(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleSaveGmeetLink} disabled={savingLink}>
+              <Save className="h-4 w-4 mr-2" />
+              {savingLink ? "Saving..." : "Save Link"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat) => (

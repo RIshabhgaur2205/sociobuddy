@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import SubscriptionCard from "@/components/profile/SubscriptionCard";
+import UserBookings from "@/components/profile/UserBookings";
 
 const INTERESTS = [
   "Gaming", "Music", "Sports", "Art", "Reading", "Movies", "Anime",
@@ -161,6 +162,11 @@ const Profile = () => {
           <p className="text-center text-muted-foreground text-sm mb-8">
             Tap the camera icon to change your photo
           </p>
+
+          {/* Booked Sessions */}
+          <div className="mb-8">
+            <UserBookings />
+          </div>
 
           {/* Subscription Section */}
           <div className="mb-8">

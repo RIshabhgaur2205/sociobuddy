@@ -134,6 +134,7 @@ export type Database = {
           created_at: string
           email: string
           experience: string | null
+          gmeet_link: string | null
           id: string
           name: string
           photo: string | null
@@ -152,6 +153,7 @@ export type Database = {
           created_at?: string
           email: string
           experience?: string | null
+          gmeet_link?: string | null
           id?: string
           name: string
           photo?: string | null
@@ -170,6 +172,7 @@ export type Database = {
           created_at?: string
           email?: string
           experience?: string | null
+          gmeet_link?: string | null
           id?: string
           name?: string
           photo?: string | null
