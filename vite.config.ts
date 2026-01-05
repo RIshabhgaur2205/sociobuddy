@@ -15,11 +15,11 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt"],
+      includeAssets: ["favicon.jpeg", "robots.txt"],
       manifest: {
-        name: "VibeCheck - Find Your People",
-        short_name: "VibeCheck",
-        description: "Connect with like-minded people and build meaningful friendships",
+        name: "SocioBuddy - Help Teens Overcome Social Anxiety & Make Friends",
+        short_name: "SocioBuddy",
+        description: "SocioBuddy connects teenagers studying in school, helping them overcome social anxiety and build meaningful friendships.",
         theme_color: "#FF6B6B",
         background_color: "#0F0F23",
         display: "standalone",
@@ -28,25 +28,25 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: "/pwa-192x192.jpeg",
             sizes: "192x192",
-            type: "image/png",
+            type: "image/jpeg",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/pwa-512x512.jpeg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/jpeg",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/pwa-512x512.jpeg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/jpeg",
             purpose: "maskable",
           },
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,jpeg}"],
       },
     }),
   ].filter(Boolean),
