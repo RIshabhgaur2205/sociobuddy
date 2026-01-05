@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -54,6 +56,7 @@ export const BookingDialog = ({ open, onOpenChange, mentor }: BookingDialogProps
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleBookSession = async () => {
     if (!user) {
@@ -69,6 +72,15 @@ export const BookingDialog = ({ open, onOpenChange, mentor }: BookingDialogProps
       toast({
         title: "Select date and time",
         description: "Please select a date and time for your session.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!termsAccepted) {
+      toast({
+        title: "Accept Terms",
+        description: "Please accept the terms and conditions to proceed.",
         variant: "destructive",
       });
       return;
@@ -107,6 +119,7 @@ export const BookingDialog = ({ open, onOpenChange, mentor }: BookingDialogProps
       setSelectedTime("");
       setNotes("");
       setIsBooked(false);
+      setTermsAccepted(false);
     }, 300);
   };
 
@@ -204,6 +217,25 @@ export const BookingDialog = ({ open, onOpenChange, mentor }: BookingDialogProps
             />
           </div>
 
+          {/* Terms and Conditions */}
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="terms"
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+            />
+            <label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+              I agree to the{" "}
+              <Link
+                to="/terms"
+                target="_blank"
+                className="text-primary hover:underline font-medium"
+              >
+                Terms and Conditions
+              </Link>
+            </label>
+          </div>
+
           {/* Price Info */}
           <div className="bg-primary/5 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-primary">FREE</p>
@@ -213,7 +245,7 @@ export const BookingDialog = ({ open, onOpenChange, mentor }: BookingDialogProps
           {/* Book Button */}
           <Button
             onClick={handleBookSession}
-            disabled={!selectedDate || !selectedTime || isSubmitting}
+            disabled={!selectedDate || !selectedTime || !termsAccepted || isSubmitting}
             className="w-full"
             size="lg"
           >

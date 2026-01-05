@@ -16,6 +16,7 @@ import Chat from "./pages/Chat";
 import Conversation from "./pages/Conversation";
 import Mentors from "./pages/Mentors";
 import Pricing from "./pages/Pricing";
+import Terms from "./pages/Terms";
 import AdminMentors from "./pages/AdminMentors";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReferralCodes from "./pages/AdminReferralCodes";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/conversation/:matchId" element={<Conversation />} />
               <Route path="/mentors" element={<Mentors />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/admin/mentors" element={<AdminMentors />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/referral-codes" element={<AdminReferralCodes />} />
