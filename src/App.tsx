@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationPrompt } from "./components/notifications/NotificationPrompt";
+import FloatingAIChat from "./components/chat/FloatingAIChat";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -49,6 +50,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <FloatingAIChat />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
