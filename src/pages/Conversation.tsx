@@ -6,9 +6,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Send, Image, Mic, Square, X, Play, Pause } from "lucide-react";
+import { ArrowLeft, Send, Image, Mic, Square, X, Play, Pause, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Message {
   id: string;
@@ -39,6 +49,7 @@ const Conversation = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -304,6 +315,23 @@ const Conversation = () => {
     setSending(false);
   };
 
+  const handleDeleteMessage = async () => {
+    if (!messageToDelete) return;
+
+    const { error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("id", messageToDelete.id);
+
+    if (error) {
+      toast.error("Failed to delete message");
+    } else {
+      setMessages((prev) => prev.filter((m) => m.id !== messageToDelete.id));
+      toast.success("Message deleted");
+    }
+    setMessageToDelete(null);
+  };
+
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString([], {
       hour: "2-digit",
@@ -359,8 +387,17 @@ const Conversation = () => {
               return (
                 <div
                   key={msg.id}
-                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                  className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
                 >
+                  {isOwn && (
+                    <button
+                      onClick={() => setMessageToDelete(msg)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity self-center mr-2 p-1.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                      title="Delete message"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                       isOwn
@@ -478,6 +515,24 @@ const Conversation = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!messageToDelete} onOpenChange={(open) => !open && setMessageToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete message?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This message will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteMessage} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
