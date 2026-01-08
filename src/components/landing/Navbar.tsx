@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, User, LogOut, GraduationCap, Shield, Gift } from "lucide-react";
+import { Heart, Menu, X, User, LogOut, GraduationCap, Shield, Gift, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
@@ -51,6 +51,10 @@ const Navbar = () => {
             <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
               <GraduationCap className="h-4 w-4" />
               Mentors
+            </Link>
+            <Link to="/communities" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
+              <Users className="h-4 w-4" />
+              Communities
             </Link>
             <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
               Pricing
@@ -149,6 +153,10 @@ const Navbar = () => {
               <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
                 Mentors
+              </Link>
+              <Link to="/communities" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Communities
               </Link>
               <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
                 Pricing
