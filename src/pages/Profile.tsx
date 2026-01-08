@@ -157,7 +157,7 @@ const Profile = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-pink-500 animate-pulse flex items-center justify-center">
             <Sparkles className="h-8 w-8 text-white animate-spin" />
@@ -174,46 +174,43 @@ const Profile = () => {
         <meta name="description" content="Manage your SocioBuddy profile and settings." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white relative overflow-hidden">
-        {/* Subtle particles background */}
-        <Suspense fallback={null}>
-          <div className="opacity-30">
-            <AnimatedParticles />
-          </div>
-        </Suspense>
+      <div className="min-h-screen bg-white relative overflow-hidden">
+        {/* Decorative blobs */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-pink-200 to-purple-200 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-40 left-0 w-64 h-64 bg-gradient-to-br from-cyan-200 to-blue-200 rounded-full blur-3xl opacity-40 -translate-x-1/3" />
 
         {/* Header */}
-        <header className="sticky top-0 bg-gray-900/80 backdrop-blur-xl border-b border-white/10 z-40">
+        <header className="sticky top-0 bg-white/90 backdrop-blur-xl border-b border-gray-100 z-40">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-            <Link to="/discover" className="p-2 rounded-xl hover:bg-white/10 transition-colors">
-              <ArrowLeft className="h-5 w-5" />
+            <Link to="/discover" className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="h-5 w-5 text-gray-800" />
             </Link>
-            <span className="font-bold text-lg">{username}</span>
+            <span className="font-bold text-lg text-gray-900">{username}</span>
             <div className="flex items-center gap-1">
               <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/10">
-                    <Settings className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-gray-100">
+                    <Settings className="h-5 w-5 text-gray-700" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-gray-900 border-white/10 text-white max-h-[90vh] overflow-y-auto">
+                <DialogContent className="bg-white border-gray-200 max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Edit Profile</DialogTitle>
+                    <DialogTitle className="text-gray-900">Edit Profile</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-5 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="username" className="text-gray-400">Username</Label>
+                      <Label htmlFor="username" className="text-gray-600">Username</Label>
                       <Input
                         id="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         maxLength={20}
-                        className="bg-gray-800 border-white/10 text-white rounded-xl"
+                        className="bg-gray-50 border-gray-200 text-gray-900 rounded-xl"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bio" className="text-gray-400">Bio</Label>
+                      <Label htmlFor="bio" className="text-gray-600">Bio</Label>
                       <Textarea
                         id="bio"
                         placeholder="Tell others about yourself..."
@@ -221,25 +218,25 @@ const Profile = () => {
                         onChange={(e) => setBio(e.target.value)}
                         rows={3}
                         maxLength={150}
-                        className="bg-gray-800 border-white/10 text-white rounded-xl resize-none"
+                        className="bg-gray-50 border-gray-200 text-gray-900 rounded-xl resize-none"
                       />
-                      <p className="text-xs text-gray-500 text-right">{bio.length}/150</p>
+                      <p className="text-xs text-gray-400 text-right">{bio.length}/150</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="school" className="text-gray-400">School</Label>
+                        <Label htmlFor="school" className="text-gray-600">School</Label>
                         <Input
                           id="school"
                           placeholder="Your school"
                           value={school}
                           onChange={(e) => setSchool(e.target.value)}
                           maxLength={100}
-                          className="bg-gray-800 border-white/10 text-white rounded-xl"
+                          className="bg-gray-50 border-gray-200 text-gray-900 rounded-xl"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="age" className="text-gray-400">Age</Label>
+                        <Label htmlFor="age" className="text-gray-600">Age</Label>
                         <Input
                           id="age"
                           type="number"
@@ -248,15 +245,15 @@ const Profile = () => {
                           onChange={(e) => setAge(e.target.value)}
                           min={13}
                           max={19}
-                          className="bg-gray-800 border-white/10 text-white rounded-xl"
+                          className="bg-gray-50 border-gray-200 text-gray-900 rounded-xl"
                         />
                       </div>
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <Label className="text-gray-400">Interests</Label>
-                        <span className="text-xs text-gray-500">{selectedInterests.length}/6</span>
+                        <Label className="text-gray-600">Interests</Label>
+                        <span className="text-xs text-gray-400">{selectedInterests.length}/6</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {INTERESTS.map((interest) => (
@@ -267,7 +264,7 @@ const Profile = () => {
                             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                               selectedInterests.includes(interest)
                                 ? "bg-gradient-to-r from-primary to-pink-500 text-white"
-                                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                             }`}
                           >
                             {selectedInterests.includes(interest) && (
@@ -283,14 +280,14 @@ const Profile = () => {
                       <Button 
                         variant="outline" 
                         onClick={() => setEditDialogOpen(false)}
-                        className="flex-1 rounded-xl border-white/10 bg-transparent hover:bg-white/10"
+                        className="flex-1 rounded-xl border-gray-200 bg-white hover:bg-gray-50"
                       >
                         Cancel
                       </Button>
                       <Button 
                         onClick={handleSave} 
                         disabled={isSaving}
-                        className="flex-1 rounded-xl bg-gradient-to-r from-primary to-pink-500"
+                        className="flex-1 rounded-xl bg-gradient-to-r from-primary to-pink-500 text-white"
                       >
                         {isSaving ? "Saving..." : "Save"}
                       </Button>
@@ -298,20 +295,20 @@ const Profile = () => {
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-xl hover:bg-white/10">
-                <LogOut className="h-5 w-5" />
+              <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-xl hover:bg-gray-100">
+                <LogOut className="h-5 w-5 text-gray-700" />
               </Button>
             </div>
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-6 max-w-lg relative z-10">
-          {/* Profile Header - Instagram Style */}
-          <div className="flex items-start gap-6 mb-6">
+          {/* Profile Header */}
+          <div className="flex items-start gap-5 mb-6">
             {/* Avatar with gradient ring */}
             <div className="relative flex-shrink-0">
-              <div className="w-24 h-24 rounded-full p-[3px] bg-gradient-to-tr from-yellow-400 via-primary to-purple-500">
-                <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
+              <div className="w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 shadow-lg">
+                <div className="w-full h-full rounded-full bg-white p-[2px]">
                   {user && (
                     <AvatarUpload
                       userId={user.id}
@@ -324,43 +321,39 @@ const Profile = () => {
                   )}
                 </div>
               </div>
-              {/* Add story button */}
-              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
-                <span className="text-white text-lg font-bold leading-none">+</span>
-              </button>
             </div>
 
             {/* Stats */}
-            <div className="flex-1 pt-2">
-              <h1 className="text-xl font-bold mb-3">{username}</h1>
-              <div className="flex gap-6">
-                <Link to="/matches" className="text-center hover:opacity-80 transition-opacity">
-                  <p className="text-xl font-bold">{friendsCount}</p>
-                  <p className="text-gray-400 text-sm">friends</p>
+            <div className="flex-1 pt-1">
+              <h1 className="text-xl font-bold text-gray-900 mb-2">{username}</h1>
+              <div className="flex gap-5">
+                <Link to="/matches" className="text-center hover:scale-105 transition-transform">
+                  <p className="text-xl font-bold text-gray-900">{friendsCount}</p>
+                  <p className="text-gray-500 text-xs font-medium">Friends</p>
                 </Link>
-                <Link to="/matches" className="text-center hover:opacity-80 transition-opacity">
-                  <p className="text-xl font-bold">{pendingCount}</p>
-                  <p className="text-gray-400 text-sm">pending</p>
+                <Link to="/matches" className="text-center hover:scale-105 transition-transform">
+                  <p className="text-xl font-bold text-gray-900">{pendingCount}</p>
+                  <p className="text-gray-500 text-xs font-medium">Pending</p>
                 </Link>
                 <div className="text-center">
-                  <p className="text-xl font-bold">{selectedInterests.length}</p>
-                  <p className="text-gray-400 text-sm">interests</p>
+                  <p className="text-xl font-bold text-gray-900">{selectedInterests.length}</p>
+                  <p className="text-gray-500 text-xs font-medium">Interests</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Bio Section */}
-          <div className="mb-6">
+          <div className="mb-5 p-4 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
             {school && (
-              <p className="text-gray-400 text-sm mb-1">
-                🎓 {school} {age && `• ${age} years old`}
+              <p className="text-gray-500 text-sm mb-1 font-medium">
+                🎓 {school} {age && `• ${age} y/o`}
               </p>
             )}
             {bio ? (
-              <p className="text-white whitespace-pre-line">{bio}</p>
+              <p className="text-gray-700 whitespace-pre-line leading-relaxed">{bio}</p>
             ) : (
-              <p className="text-gray-500 italic">Add a bio to tell people about yourself...</p>
+              <p className="text-gray-400 italic text-sm">Add a bio to tell people about yourself...</p>
             )}
             
             {/* Interests as tags */}
@@ -369,7 +362,7 @@ const Profile = () => {
                 {selectedInterests.map((interest, i) => (
                   <span
                     key={interest}
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${interestColors[i % interestColors.length]} text-white`}
+                    className={`px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${interestColors[i % interestColors.length]} text-white shadow-sm`}
                   >
                     {interest}
                   </span>
@@ -382,13 +375,13 @@ const Profile = () => {
           <div className="flex gap-2 mb-6">
             <Button 
               onClick={() => setEditDialogOpen(true)}
-              className="flex-1 bg-gray-800 hover:bg-gray-700 text-white rounded-xl"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-semibold shadow-sm border-0"
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Edit profile
             </Button>
             <Link to="/matches" className="flex-1">
-              <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-xl">
+              <Button className="w-full bg-gradient-to-r from-primary to-pink-500 hover:opacity-90 text-white rounded-xl font-semibold shadow-md">
                 <Users className="h-4 w-4 mr-2" />
                 View friends
               </Button>
@@ -397,29 +390,31 @@ const Profile = () => {
 
           {/* Tabs for different sections */}
           <Tabs defaultValue="bookings" className="w-full">
-            <TabsList className="w-full bg-transparent border-b border-white/10 rounded-none h-auto p-0 mb-4">
+            <TabsList className="w-full bg-gray-100 rounded-2xl p-1 h-auto mb-4">
               <TabsTrigger 
                 value="bookings" 
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-white data-[state=active]:bg-transparent py-3"
+                className="flex-1 rounded-xl py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm text-gray-600 data-[state=active]:text-gray-900"
               >
-                <Grid3X3 className="h-5 w-5" />
+                <Grid3X3 className="h-4 w-4 mr-2" />
+                Bookings
               </TabsTrigger>
               <TabsTrigger 
                 value="subscription" 
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-white data-[state=active]:bg-transparent py-3"
+                className="flex-1 rounded-xl py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm text-gray-600 data-[state=active]:text-gray-900"
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-4 w-4 mr-2" />
+                Plan
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="bookings" className="mt-0">
-              <div className="bg-gray-800/50 rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <UserBookings />
               </div>
             </TabsContent>
 
             <TabsContent value="subscription" className="mt-0">
-              <div className="bg-gray-800/50 rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <SubscriptionCard />
               </div>
             </TabsContent>
