@@ -9,6 +9,7 @@ import { NotificationPrompt } from "./components/notifications/NotificationPromp
 import FloatingAIChat from "./components/chat/FloatingAIChat";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Onboarding from "./pages/Onboarding";
 import Discover from "./pages/Discover";
 import Matches from "./pages/Matches";
@@ -42,6 +43,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/discover" element={<Discover />} />
               <Route path="/matches" element={<Matches />} />
