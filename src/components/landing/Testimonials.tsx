@@ -1,31 +1,25 @@
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, Heart } from "lucide-react";
 
-const testimonials = [
+const founderStories = [
   {
-    name: "Sarah M.",
-    age: 16,
-    school: "Lincoln High",
-    quote: "I used to eat lunch alone every day. SocioBuddy helped me find friends who actually get me. Now I have a group I hang out with regularly!",
-    avatar: "S",
-    rating: 5,
+    name: "Divyank Mehra",
+    role: "Founder",
+    quote: "In my life, I have many male as well as female friends who trust me deeply and feel comfortable sharing anything with me, knowing I never judge them. This trust allows them to open up, lighten their hearts, and heal. Realizing how much my own supportive background helped me, I understood that many others also need someone to listen. That's why I created SociBuddy.",
+    avatar: "D",
     gradient: "from-coral-light to-coral",
   },
   {
-    name: "James K.",
-    age: 15,
-    school: "Westview Academy",
-    quote: "The ice breakers made it so easy to start conversations. I'm way more confident now and even joined the debate club!",
-    avatar: "J",
-    rating: 5,
+    name: "Surjesh Pal",
+    role: "Co-Founder",
+    quote: "The purpose of SociBuddy is to create a safe and trustworthy platform where people can freely share their emotions without fear. SociBuddy connects individuals who genuinely want to help, allowing people to open up and communicate openly.",
+    avatar: "S",
     gradient: "from-teal to-teal-light",
   },
   {
-    name: "Mia C.",
-    age: 17,
-    school: "Central Prep",
-    quote: "Moving to a new school was terrifying, but SocioBuddy connected me with other new students. We became best friends!",
-    avatar: "M",
-    rating: 5,
+    name: "Aditya Kaushik",
+    role: "Co-Founder",
+    quote: "During personal and family problem, we often feel overwhelmed with emotions and need someone who can offer understanding and support, reminding us that it's all part of life. This is at the core of why SociBuddy was created—to help people heal and find comfort.",
+    avatar: "A",
     gradient: "from-sunshine to-accent",
   },
 ];
@@ -40,53 +34,46 @@ const Testimonials = () => {
       <div className="container mx-auto px-4 relative">
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-sunshine/10 px-4 py-2 text-sm font-medium text-foreground mb-6">
-            <Star className="h-4 w-4 fill-sunshine text-sunshine" />
-            <span>Loved by Teens</span>
+            <Heart className="h-4 w-4 fill-coral text-coral" />
+            <span>Our Story</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-            Real Stories from
-            <span className="block text-gradient mt-2">Real Teens</span>
+            Meet the
+            <span className="block text-gradient mt-2">Founders</span>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
-            Hear from teenagers who transformed their social lives with SocioBuddy
+            The vision and heart behind SociBuddy
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+          {founderStories.map((founder, index) => (
             <div
               key={index}
               className="group relative glass-card rounded-3xl p-8 hover-lift animate-fade-in"
               style={{ animationDelay: `${index * 0.15}s` }}
             >
               {/* Quote icon */}
-              <div className={`absolute -top-4 right-8 w-12 h-12 rounded-xl bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center shadow-lg`}>
+              <div className={`absolute -top-4 right-8 w-12 h-12 rounded-xl bg-gradient-to-br ${founder.gradient} flex items-center justify-center shadow-lg`}>
                 <Quote className="h-6 w-6 text-primary-foreground" />
               </div>
-              
-              {/* Stars */}
-              <div className="flex gap-1 mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-sunshine text-sunshine" />
-                ))}
-              </div>
 
-              <p className="text-foreground mb-8 leading-relaxed text-lg italic">"{testimonial.quote}"</p>
+              <p className="text-foreground mb-8 leading-relaxed text-lg italic">"{founder.quote}"</p>
 
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg group-hover:scale-110 transition-transform`}>
-                  {testimonial.avatar}
+                <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${founder.gradient} flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg group-hover:scale-110 transition-transform`}>
+                  {founder.avatar}
                 </div>
                 <div>
-                  <p className="font-bold text-foreground text-lg">{testimonial.name}</p>
+                  <p className="font-bold text-foreground text-lg">{founder.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    Age {testimonial.age} • {testimonial.school}
+                    {founder.role}
                   </p>
                 </div>
               </div>
               
               {/* Decorative element */}
-              <div className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${testimonial.gradient} rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity`} />
+              <div className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r ${founder.gradient} rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity`} />
             </div>
           ))}
         </div>
