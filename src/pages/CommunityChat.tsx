@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Send, Image, Users, Copy, Check, LogOut } from "lucide-react";
+import { ArrowLeft, Send, Image, Users, Copy, Check, LogOut, Trash2, Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -52,6 +54,10 @@ const CommunityChat = () => {
   const [sending, setSending] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [userProfile, setUserProfile] = useState<{ username: string } | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editNameOpen, setEditNameOpen] = useState(false);
+  const [newCommunityName, setNewCommunityName] = useState("");
+  const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -117,6 +123,7 @@ const CommunityChat = () => {
     }
 
     setCommunity(data);
+    setNewCommunityName(data.name);
   };
 
   const fetchMessages = async () => {
@@ -144,6 +151,10 @@ const CommunityChat = () => {
         .eq("community_id", communityId);
 
       if (error) throw error;
+
+      // Check if current user is admin
+      const currentUserMember = memberData?.find(m => m.user_id === user?.id);
+      setIsAdmin(currentUserMember?.role === "admin");
 
       // Fetch profiles for members
       if (memberData && memberData.length > 0) {
@@ -242,6 +253,50 @@ const CommunityChat = () => {
     }
   };
 
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
+    
+    try {
+      const { error } = await supabase
+        .from("community_members")
+        .delete()
+        .eq("community_id", communityId)
+        .eq("user_id", memberToRemove.user_id);
+
+      if (error) throw error;
+
+      toast.success(`Removed ${memberToRemove.username} from community`);
+      setMemberToRemove(null);
+      fetchMembers();
+    } catch (error: any) {
+      console.error("Error removing member:", error);
+      toast.error("Failed to remove member");
+    }
+  };
+
+  const handleRenameCommunity = async () => {
+    if (!newCommunityName.trim()) {
+      toast.error("Please enter a community name");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("communities")
+        .update({ name: newCommunityName })
+        .eq("id", communityId);
+
+      if (error) throw error;
+
+      setCommunity(prev => prev ? { ...prev, name: newCommunityName } : null);
+      setEditNameOpen(false);
+      toast.success("Community renamed successfully");
+    } catch (error: any) {
+      console.error("Error renaming community:", error);
+      toast.error("Failed to rename community");
+    }
+  };
+
   const copyInviteCode = () => {
     if (community) {
       navigator.clipboard.writeText(community.invite_code);
@@ -302,27 +357,42 @@ const CommunityChat = () => {
                       {community?.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <h2 className="mt-3 font-semibold text-lg">{community?.name}</h2>
+                  <div className="mt-3 flex items-center justify-center gap-2">
+                    <h2 className="font-semibold text-lg">{community?.name}</h2>
+                    {isAdmin && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6"
+                        onClick={() => setEditNameOpen(true)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                   {community?.description && (
                     <p className="text-sm text-muted-foreground mt-1">{community.description}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Invite Code</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-muted px-3 py-2 rounded-md text-center tracking-widest font-mono">
-                      {community?.invite_code}
-                    </code>
-                    <Button variant="outline" size="icon" onClick={copyInviteCode}>
-                      {copiedCode ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
+                {/* Invite Code - Only visible to admin */}
+                {isAdmin && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Invite Code (Admin Only)</p>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 bg-muted px-3 py-2 rounded-md text-center tracking-widest font-mono">
+                        {community?.invite_code}
+                      </code>
+                      <Button variant="outline" size="icon" onClick={copyInviteCode}>
+                        {copiedCode ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="space-y-3">
                   <p className="text-sm font-medium">Members ({members.length})</p>
@@ -341,6 +411,17 @@ const CommunityChat = () => {
                             <span className="text-xs text-primary">Admin</span>
                           )}
                         </div>
+                        {/* Admin can remove members (except themselves) */}
+                        {isAdmin && member.user_id !== user?.id && member.role !== "admin" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => setMemberToRemove(member)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -460,6 +541,51 @@ const CommunityChat = () => {
           </Button>
         </form>
       </div>
+
+      {/* Rename Community Dialog */}
+      <Dialog open={editNameOpen} onOpenChange={setEditNameOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Community</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>Community Name</Label>
+              <Input
+                value={newCommunityName}
+                onChange={(e) => setNewCommunityName(e.target.value)}
+                placeholder="Enter new name"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setEditNameOpen(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleRenameCommunity}>
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Member Dialog */}
+      <AlertDialog open={!!memberToRemove} onOpenChange={() => setMemberToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {memberToRemove?.username} from the community? They can rejoin using the invite code.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRemoveMember} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
