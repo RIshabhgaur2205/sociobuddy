@@ -44,6 +44,11 @@ interface DbMentorPublic {
   reviews_count: number;
 }
 
+interface ProfileData {
+  id: string;
+  avatar_url: string | null;
+}
+
 // Full mentor data (includes email - only for own profile or admin)
 interface DbMentorFull extends DbMentorPublic {
   email: string;
@@ -156,24 +161,41 @@ const Mentors = () => {
         .from("mentors_public")
         .select("*");
 
-      if (!mentorsError && mentorsData) {
-        const dbMentors: Mentor[] = mentorsData.map((m: DbMentorPublic) => ({
-          id: m.id,
-          name: m.name,
-          photo: m.photo || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-          title: m.title,
-          experience: m.experience || "N/A",
-          specialties: m.specialties || [],
-          rating: Number(m.rating) || 0,
-          reviews: m.reviews_count || 0,
-          costPerSession: 0,
-          availability: m.availability || "Flexible",
-          bio: m.bio || "",
-          verified: m.verified || false,
-        }));
+      if (!mentorsError && mentorsData && mentorsData.length > 0) {
+        // Fetch profile avatars for all mentors
+        const userIds = mentorsData.map((m: DbMentorPublic) => m.user_id);
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, avatar_url")
+          .in("id", userIds);
+
+        const profilesMap = new Map<string, string | null>();
+        profilesData?.forEach((p: ProfileData) => {
+          profilesMap.set(p.id, p.avatar_url);
+        });
+
+        const dbMentors: Mentor[] = mentorsData.map((m: DbMentorPublic) => {
+          // Use mentor photo if set, otherwise use profile avatar
+          const profileAvatar = profilesMap.get(m.user_id);
+          const photoUrl = m.photo || profileAvatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face";
+          
+          return {
+            id: m.id,
+            name: m.name,
+            photo: photoUrl,
+            title: m.title,
+            experience: m.experience || "N/A",
+            specialties: m.specialties || [],
+            rating: Number(m.rating) || 0,
+            reviews: m.reviews_count || 0,
+            costPerSession: 0,
+            availability: m.availability || "Flexible",
+            bio: m.bio || "",
+            verified: m.verified || false,
+          };
+        });
         
-        // Combine database mentors with sample mentors (db mentors first)
-        setApprovedMentors(dbMentors.length > 0 ? dbMentors : sampleMentors);
+        setApprovedMentors(dbMentors);
       } else {
         setApprovedMentors(sampleMentors);
       }
