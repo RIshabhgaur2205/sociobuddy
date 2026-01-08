@@ -15,6 +15,8 @@ import Matches from "./pages/Matches";
 import Profile from "./pages/Profile";
 import Conversation from "./pages/Conversation";
 import Mentors from "./pages/Mentors";
+import Communities from "./pages/Communities";
+import CommunityChat from "./pages/CommunityChat";
 import Pricing from "./pages/Pricing";
 import Terms from "./pages/Terms";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -46,6 +48,8 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/conversation/:matchId" element={<Conversation />} />
               <Route path="/mentors" element={<Mentors />} />
+              <Route path="/communities" element={<Communities />} />
+              <Route path="/community/:communityId" element={<CommunityChat />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
