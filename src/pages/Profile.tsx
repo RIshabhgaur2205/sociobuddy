@@ -182,7 +182,7 @@ const Profile = () => {
         {/* Header */}
         <header className="sticky top-0 bg-white/90 backdrop-blur-xl border-b border-gray-100 z-40">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-            <Link to="/discover" className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <Link to="/" className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
               <ArrowLeft className="h-5 w-5 text-gray-800" />
             </Link>
             <span className="font-bold text-lg text-gray-900">{username}</span>
