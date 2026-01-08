@@ -5,14 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, LogOut, Check, Save, Sparkles, Star, Heart, User } from "lucide-react";
+import { ArrowLeft, LogOut, Check, Save, Sparkles, Settings, MessageCircle, Users, Edit3, Grid3X3, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import SubscriptionCard from "@/components/profile/SubscriptionCard";
 import UserBookings from "@/components/profile/UserBookings";
-import Interactive3DCard from "@/components/ui/Interactive3DCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const AnimatedParticles = lazy(() => import("@/components/ui/AnimatedParticles"));
 
@@ -23,15 +24,12 @@ const INTERESTS = [
 ];
 
 const interestColors = [
-  "from-pink-100 to-pink-200",
-  "from-teal-100 to-teal-200",
-  "from-yellow-100 to-yellow-200",
-  "from-purple-100 to-purple-200",
-  "from-blue-100 to-blue-200",
-  "from-green-100 to-green-200",
-  "from-orange-100 to-orange-200",
-  "from-cyan-100 to-cyan-200",
-  "from-rose-100 to-rose-200",
+  "from-pink-400 to-rose-400",
+  "from-teal-400 to-cyan-400",
+  "from-yellow-400 to-orange-400",
+  "from-purple-400 to-violet-400",
+  "from-blue-400 to-indigo-400",
+  "from-green-400 to-emerald-400",
 ];
 
 const Profile = () => {
@@ -43,6 +41,9 @@ const Profile = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
 
@@ -54,6 +55,7 @@ const Profile = () => {
 
     if (user) {
       fetchProfile();
+      fetchStats();
     }
   }, [user, loading, navigate]);
 
@@ -81,6 +83,31 @@ const Profile = () => {
       console.error("Error fetching profile:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    if (!user) return;
+
+    try {
+      // Count accepted matches (friends)
+      const { count: friends } = await supabase
+        .from("matches")
+        .select("*", { count: "exact", head: true })
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+        .eq("status", "accepted");
+
+      // Count pending requests received
+      const { count: pending } = await supabase
+        .from("matches")
+        .select("*", { count: "exact", head: true })
+        .eq("user2_id", user.id)
+        .eq("status", "pending");
+
+      setFriendsCount(friends || 0);
+      setPendingCount(pending || 0);
+    } catch (err) {
+      console.error("Error fetching stats:", err);
     }
   };
 
@@ -113,6 +140,7 @@ const Profile = () => {
       if (error) throw error;
 
       toast.success("✨ Profile updated!");
+      setEditDialogOpen(false);
     } catch (err) {
       console.error("Error updating profile:", err);
       toast.error("Failed to update profile");
@@ -129,12 +157,11 @@ const Profile = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-background to-teal-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-pink-400 animate-pulse flex items-center justify-center">
-            <User className="h-8 w-8 text-white animate-bounce" />
+          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-pink-500 animate-pulse flex items-center justify-center">
+            <Sparkles className="h-8 w-8 text-white animate-spin" />
           </div>
-          <p className="text-muted-foreground animate-pulse">Loading your profile...</p>
         </div>
       </div>
     );
@@ -143,209 +170,260 @@ const Profile = () => {
   return (
     <>
       <Helmet>
-        <title>My Profile - SocioBuddy</title>
+        <title>{username} - SocioBuddy</title>
         <meta name="description" content="Manage your SocioBuddy profile and settings." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-background to-teal-50 relative overflow-hidden">
-        {/* 3D Particles Background */}
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white relative overflow-hidden">
+        {/* Subtle particles background */}
         <Suspense fallback={null}>
-          <AnimatedParticles />
+          <div className="opacity-30">
+            <AnimatedParticles />
+          </div>
         </Suspense>
 
-        {/* Decorative blobs */}
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-pink-300/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 -right-20 w-96 h-96 bg-teal-300/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-yellow-200/20 rounded-full blur-3xl" />
-
         {/* Header */}
-        <header className="sticky top-0 bg-white/70 backdrop-blur-xl border-b border-white/20 z-40 shadow-sm">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-xl hover:bg-pink-100/50">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-pink-500 flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-white" />
-                </div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-                  My Profile
-                </h1>
-              </div>
+        <header className="sticky top-0 bg-gray-900/80 backdrop-blur-xl border-b border-white/10 z-40">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <Link to="/discover" className="p-2 rounded-xl hover:bg-white/10 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <span className="font-bold text-lg">{username}</span>
+            <div className="flex items-center gap-1">
+              <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/10">
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-gray-900 border-white/10 text-white max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Edit Profile</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-5 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="username" className="text-gray-400">Username</Label>
+                      <Input
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        maxLength={20}
+                        className="bg-gray-800 border-white/10 text-white rounded-xl"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bio" className="text-gray-400">Bio</Label>
+                      <Textarea
+                        id="bio"
+                        placeholder="Tell others about yourself..."
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        rows={3}
+                        maxLength={150}
+                        className="bg-gray-800 border-white/10 text-white rounded-xl resize-none"
+                      />
+                      <p className="text-xs text-gray-500 text-right">{bio.length}/150</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="school" className="text-gray-400">School</Label>
+                        <Input
+                          id="school"
+                          placeholder="Your school"
+                          value={school}
+                          onChange={(e) => setSchool(e.target.value)}
+                          maxLength={100}
+                          className="bg-gray-800 border-white/10 text-white rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="age" className="text-gray-400">Age</Label>
+                        <Input
+                          id="age"
+                          type="number"
+                          placeholder="13-19"
+                          value={age}
+                          onChange={(e) => setAge(e.target.value)}
+                          min={13}
+                          max={19}
+                          className="bg-gray-800 border-white/10 text-white rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label className="text-gray-400">Interests</Label>
+                        <span className="text-xs text-gray-500">{selectedInterests.length}/6</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {INTERESTS.map((interest) => (
+                          <button
+                            key={interest}
+                            type="button"
+                            onClick={() => toggleInterest(interest)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                              selectedInterests.includes(interest)
+                                ? "bg-gradient-to-r from-primary to-pink-500 text-white"
+                                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                            }`}
+                          >
+                            {selectedInterests.includes(interest) && (
+                              <Check className="inline h-3 w-3 mr-1" />
+                            )}
+                            {interest}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setEditDialogOpen(false)}
+                        className="flex-1 rounded-xl border-white/10 bg-transparent hover:bg-white/10"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={handleSave} 
+                        disabled={isSaving}
+                        className="flex-1 rounded-xl bg-gradient-to-r from-primary to-pink-500"
+                      >
+                        {isSaving ? "Saving..." : "Save"}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-xl hover:bg-white/10">
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
-            <Button 
-              variant="ghost" 
-              onClick={handleSignOut}
-              className="rounded-2xl hover:bg-red-100/50 text-muted-foreground hover:text-red-500 transition-colors"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-8 max-w-xl relative z-10">
-          {/* Avatar Section */}
-          <Interactive3DCard className="mb-8" tiltAmount={8}>
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
-              <div className="flex flex-col items-center">
-                <div className="relative mb-4">
+        <main className="container mx-auto px-4 py-6 max-w-lg relative z-10">
+          {/* Profile Header - Instagram Style */}
+          <div className="flex items-start gap-6 mb-6">
+            {/* Avatar with gradient ring */}
+            <div className="relative flex-shrink-0">
+              <div className="w-24 h-24 rounded-full p-[3px] bg-gradient-to-tr from-yellow-400 via-primary to-purple-500">
+                <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
                   {user && (
                     <AvatarUpload
                       userId={user.id}
                       avatarUrl={avatarUrl}
                       username={username}
-                      size="xl"
+                      size="lg"
                       editable
                       onUploadComplete={setAvatarUrl}
                     />
                   )}
-                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-r from-primary to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Heart className="h-5 w-5 text-white" fill="white" />
-                  </div>
                 </div>
-                <p className="text-muted-foreground text-sm flex items-center gap-2">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  Tap the camera icon to change your photo
-                </p>
+              </div>
+              {/* Add story button */}
+              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
+                <span className="text-white text-lg font-bold leading-none">+</span>
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="flex-1 pt-2">
+              <h1 className="text-xl font-bold mb-3">{username}</h1>
+              <div className="flex gap-6">
+                <Link to="/matches" className="text-center hover:opacity-80 transition-opacity">
+                  <p className="text-xl font-bold">{friendsCount}</p>
+                  <p className="text-gray-400 text-sm">friends</p>
+                </Link>
+                <Link to="/matches" className="text-center hover:opacity-80 transition-opacity">
+                  <p className="text-xl font-bold">{pendingCount}</p>
+                  <p className="text-gray-400 text-sm">pending</p>
+                </Link>
+                <div className="text-center">
+                  <p className="text-xl font-bold">{selectedInterests.length}</p>
+                  <p className="text-gray-400 text-sm">interests</p>
+                </div>
               </div>
             </div>
-          </Interactive3DCard>
-
-          {/* Bookings & Subscription */}
-          <div className="space-y-6 mb-8">
-            <Interactive3DCard tiltAmount={5}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden">
-                <UserBookings />
-              </div>
-            </Interactive3DCard>
-
-            <Interactive3DCard tiltAmount={5}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden">
-                <SubscriptionCard />
-              </div>
-            </Interactive3DCard>
           </div>
 
-          {/* Profile Form */}
-          <Interactive3DCard tiltAmount={3}>
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 space-y-6">
-              <div className="flex items-center gap-2 pb-4 border-b border-gray-100">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-teal-400 to-cyan-400 flex items-center justify-center">
-                  <User className="h-4 w-4 text-white" />
-                </div>
-                <h2 className="font-bold text-lg">Profile Details</h2>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-sm font-medium text-muted-foreground">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  maxLength={20}
-                  className="rounded-2xl border-gray-200 focus:border-primary bg-white/50 backdrop-blur"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="text-sm font-medium text-muted-foreground">
-                  Bio
-                </Label>
-                <Textarea
-                  id="bio"
-                  placeholder="Tell others about yourself..."
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  rows={4}
-                  maxLength={300}
-                  className="rounded-2xl border-gray-200 focus:border-primary bg-white/50 backdrop-blur resize-none"
-                />
-                <p className="text-xs text-muted-foreground text-right">{bio.length}/300</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="school" className="text-sm font-medium text-muted-foreground">
-                    School
-                  </Label>
-                  <Input
-                    id="school"
-                    placeholder="Your school"
-                    value={school}
-                    onChange={(e) => setSchool(e.target.value)}
-                    maxLength={100}
-                    className="rounded-2xl border-gray-200 focus:border-primary bg-white/50 backdrop-blur"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="age" className="text-sm font-medium text-muted-foreground">
-                    Age
-                  </Label>
-                  <Input
-                    id="age"
-                    type="number"
-                    placeholder="13-19"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    min={13}
-                    max={19}
-                    className="rounded-2xl border-gray-200 focus:border-primary bg-white/50 backdrop-blur"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <Label className="text-sm font-medium text-muted-foreground">Interests</Label>
-                  <span className="text-xs bg-gradient-to-r from-pink-100 to-teal-100 px-3 py-1 rounded-full font-medium">
-                    {selectedInterests.length}/6 selected
+          {/* Bio Section */}
+          <div className="mb-6">
+            {school && (
+              <p className="text-gray-400 text-sm mb-1">
+                🎓 {school} {age && `• ${age} years old`}
+              </p>
+            )}
+            {bio ? (
+              <p className="text-white whitespace-pre-line">{bio}</p>
+            ) : (
+              <p className="text-gray-500 italic">Add a bio to tell people about yourself...</p>
+            )}
+            
+            {/* Interests as tags */}
+            {selectedInterests.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {selectedInterests.map((interest, i) => (
+                  <span
+                    key={interest}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${interestColors[i % interestColors.length]} text-white`}
+                  >
+                    {interest}
                   </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {INTERESTS.map((interest, index) => (
-                    <button
-                      key={interest}
-                      type="button"
-                      onClick={() => toggleInterest(interest)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
-                        selectedInterests.includes(interest)
-                          ? "bg-gradient-to-r from-primary to-pink-500 text-white shadow-lg"
-                          : `bg-gradient-to-r ${interestColors[index % interestColors.length]} text-foreground hover:shadow-md`
-                      }`}
-                    >
-                      {selectedInterests.includes(interest) && (
-                        <Check className="inline h-3 w-3 mr-1" />
-                      )}
-                      {interest}
-                    </button>
-                  ))}
-                </div>
+                ))}
               </div>
+            )}
+          </div>
 
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving} 
-                className="w-full rounded-2xl py-6 text-lg font-semibold bg-gradient-to-r from-primary to-pink-500 hover:opacity-90 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {isSaving ? (
-                  <>
-                    <Sparkles className="h-5 w-5 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-5 w-5 mr-2" />
-                    Save Profile
-                  </>
-                )}
+          {/* Action Buttons */}
+          <div className="flex gap-2 mb-6">
+            <Button 
+              onClick={() => setEditDialogOpen(true)}
+              className="flex-1 bg-gray-800 hover:bg-gray-700 text-white rounded-xl"
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Edit profile
+            </Button>
+            <Link to="/matches" className="flex-1">
+              <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-xl">
+                <Users className="h-4 w-4 mr-2" />
+                View friends
               </Button>
-            </div>
-          </Interactive3DCard>
+            </Link>
+          </div>
+
+          {/* Tabs for different sections */}
+          <Tabs defaultValue="bookings" className="w-full">
+            <TabsList className="w-full bg-transparent border-b border-white/10 rounded-none h-auto p-0 mb-4">
+              <TabsTrigger 
+                value="bookings" 
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-white data-[state=active]:bg-transparent py-3"
+              >
+                <Grid3X3 className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="subscription" 
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-white data-[state=active]:bg-transparent py-3"
+              >
+                <Heart className="h-5 w-5" />
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="bookings" className="mt-0">
+              <div className="bg-gray-800/50 rounded-2xl border border-white/10 overflow-hidden">
+                <UserBookings />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="subscription" className="mt-0">
+              <div className="bg-gray-800/50 rounded-2xl border border-white/10 overflow-hidden">
+                <SubscriptionCard />
+              </div>
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </>
