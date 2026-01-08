@@ -4,9 +4,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heart, Mail, Lock, User, ArrowLeft, Sparkles, Gift } from "lucide-react";
+import { Mail, Lock, User, ArrowLeft, Sparkles, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import logo from "@/assets/logo.jpeg";
 import { z } from "zod";
 
 const signUpSchema = z.object({
@@ -99,9 +100,7 @@ const Auth = () => {
             </Link>
 
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-coral-light to-coral flex items-center justify-center">
-                <Heart className="h-6 w-6 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="SocioBuddy Logo" className="w-12 h-12 rounded-xl object-cover" />
               <div>
                 <h1 className="text-2xl font-bold">SocioBuddy</h1>
                 <p className="text-sm text-muted-foreground">

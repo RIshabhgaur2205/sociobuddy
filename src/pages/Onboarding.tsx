@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Heart, ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/logo.jpeg";
 
 const INTERESTS = [
   "Gaming", "Music", "Sports", "Art", "Reading", "Movies", "Anime",
@@ -106,9 +107,7 @@ const Onboarding = () => {
         <div className="max-w-xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-full gradient-hero mx-auto flex items-center justify-center mb-4">
-              <Heart className="h-8 w-8 text-foreground" />
-            </div>
+            <img src={logo} alt="SocioBuddy Logo" className="w-16 h-16 rounded-full mx-auto mb-4 object-cover" />
             <h1 className="text-2xl font-bold mb-2">Let's Get to Know You</h1>
             <p className="text-muted-foreground">Step {step} of 3</p>
           </div>
