@@ -107,6 +107,7 @@ export type Database = {
           content_type: string
           created_at: string
           id: string
+          is_pinned: boolean | null
           media_url: string | null
           sender_id: string
           sender_username: string
@@ -117,6 +118,7 @@ export type Database = {
           content_type?: string
           created_at?: string
           id?: string
+          is_pinned?: boolean | null
           media_url?: string | null
           sender_id: string
           sender_username: string
@@ -127,6 +129,7 @@ export type Database = {
           content_type?: string
           created_at?: string
           id?: string
+          is_pinned?: boolean | null
           media_url?: string | null
           sender_id?: string
           sender_username?: string
