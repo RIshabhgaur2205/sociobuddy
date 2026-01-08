@@ -35,11 +35,21 @@ export const NotificationPrompt = () => {
         description: "You'll be notified about new messages and matches.",
       });
     } else {
-      toast({
-        title: "Notifications blocked",
-        description: "Please enable notifications in your browser settings.",
-        variant: "destructive",
-      });
+      // Check current permission state to show appropriate message
+      const currentPerm = Notification.permission;
+      if (currentPerm === "denied") {
+        toast({
+          title: "Notifications blocked",
+          description: "Please enable notifications in your browser settings.",
+          variant: "destructive",
+        });
+      } else if (currentPerm === "default") {
+        // User dismissed the prompt, don't show error
+        toast({
+          title: "Permission needed",
+          description: "Click enable again to allow notifications.",
+        });
+      }
     }
   };
 
