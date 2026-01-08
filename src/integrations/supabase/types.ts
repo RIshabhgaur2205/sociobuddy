@@ -608,11 +608,16 @@ export type Database = {
         Args: { _mentor_user_id: string }
         Returns: boolean
       }
+      get_user_community_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_community_member: {
+        Args: { _community_id: string; _user_id: string }
         Returns: boolean
       }
     }
