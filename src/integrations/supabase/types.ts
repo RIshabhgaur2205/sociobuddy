@@ -439,9 +439,69 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      mentors_public: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          created_at: string | null
+          experience: string | null
+          gmeet_link: string | null
+          id: string | null
+          name: string | null
+          photo: string | null
+          rating: number | null
+          reviews_count: number | null
+          specialties: string[] | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string | null
+          experience?: string | null
+          gmeet_link?: string | null
+          id?: string | null
+          name?: string | null
+          photo?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string | null
+          experience?: string | null
+          gmeet_link?: string | null
+          id?: string | null
+          name?: string | null
+          photo?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      can_view_mentor_email: {
+        Args: { _mentor_user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

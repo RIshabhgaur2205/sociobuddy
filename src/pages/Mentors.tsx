@@ -27,11 +27,11 @@ interface Mentor {
   verified: boolean;
 }
 
-interface DbMentor {
+// Public mentor data (from mentors_public view - no email)
+interface DbMentorPublic {
   id: string;
   user_id: string;
   name: string;
-  email: string;
   photo: string | null;
   title: string;
   experience: string | null;
@@ -42,6 +42,11 @@ interface DbMentor {
   verified: boolean;
   rating: number;
   reviews_count: number;
+}
+
+// Full mentor data (includes email - only for own profile or admin)
+interface DbMentorFull extends DbMentorPublic {
+  email: string;
 }
 
 // Sample mentors (fallback)
@@ -138,7 +143,7 @@ const Mentors = () => {
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
-  const [userMentorStatus, setUserMentorStatus] = useState<DbMentor | null>(null);
+  const [userMentorStatus, setUserMentorStatus] = useState<DbMentorFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("find");
   const [approvedMentors, setApprovedMentors] = useState<Mentor[]>([]);
@@ -146,14 +151,13 @@ const Mentors = () => {
   // Fetch approved mentors and user's mentor status
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch approved mentors from database
+      // Fetch approved mentors from the public view (excludes email for privacy)
       const { data: mentorsData, error: mentorsError } = await supabase
-        .from("mentors")
-        .select("*")
-        .eq("status", "approved");
+        .from("mentors_public")
+        .select("*");
 
       if (!mentorsError && mentorsData) {
-        const dbMentors: Mentor[] = mentorsData.map((m: DbMentor) => ({
+        const dbMentors: Mentor[] = mentorsData.map((m: DbMentorPublic) => ({
           id: m.id,
           name: m.name,
           photo: m.photo || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
@@ -183,7 +187,7 @@ const Mentors = () => {
           .maybeSingle();
 
         if (!error && data) {
-          setUserMentorStatus(data as DbMentor);
+          setUserMentorStatus(data as DbMentorFull);
         }
       }
       
@@ -319,7 +323,7 @@ const Mentors = () => {
             setUserMentorStatus({
               ...userMentorStatus!,
               status: "pending",
-            } as DbMentor);
+            } as DbMentorFull);
           }}
         />
       </div>
