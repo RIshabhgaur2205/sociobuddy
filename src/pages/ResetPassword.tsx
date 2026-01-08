@@ -14,18 +14,38 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidSession, setIsValidSession] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user came from a valid reset link
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get("access_token");
-    const type = hashParams.get("type");
+    const checkSession = async () => {
+      // First check if there's a recovery session from URL hash (Supabase auto-exchanges)
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (session) {
+        setIsValidSession(true);
+        setIsChecking(false);
+        return;
+      }
 
-    if (!accessToken || type !== "recovery") {
-      toast.error("Invalid or expired reset link");
-      navigate("/auth");
-    }
+      // Listen for auth state changes (handles the token exchange)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+          setIsValidSession(true);
+          setIsChecking(false);
+        }
+      });
+
+      // Give it a moment to process the URL hash
+      setTimeout(() => {
+        setIsChecking(false);
+      }, 2000);
+
+      return () => subscription.unsubscribe();
+    };
+
+    checkSession();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +77,46 @@ const ResetPassword = () => {
       setIsLoading(false);
     }
   };
+
+  if (isChecking) {
+    return (
+      <>
+        <Helmet>
+          <title>Reset Password - SocioBuddy</title>
+        </Helmet>
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Verifying reset link...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!isValidSession && !isSuccess) {
+    return (
+      <>
+        <Helmet>
+          <title>Reset Password - SocioBuddy</title>
+        </Helmet>
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto flex items-center justify-center mb-6">
+              <Lock className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Link Expired or Invalid</h1>
+            <p className="text-muted-foreground mb-6">
+              This password reset link has expired or has already been used. Please request a new password reset.
+            </p>
+            <Button onClick={() => navigate("/auth")} className="w-full">
+              Back to Login
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (isSuccess) {
     return (
