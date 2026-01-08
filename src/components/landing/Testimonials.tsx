@@ -81,8 +81,8 @@ const Testimonials = () => {
         {/* Stats row */}
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { value: "10K+", label: "Active Users" },
-            { value: "50K+", label: "Friendships Made" },
+            { value: "100+", label: "Active Users" },
+            { value: "50+", label: "Friendships Made" },
             { value: "4.9", label: "App Rating" },
             { value: "98%", label: "Happy Teens" },
           ].map((stat, index) => (
