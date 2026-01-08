@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Send, Image, Users, Copy, Check, LogOut, Trash2, Edit, X } from "lucide-react";
+import { ArrowLeft, Send, Image, Users, Copy, Check, LogOut, Trash2, Edit, Pin, PinOff, Crown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +21,7 @@ interface Message {
   content_type: string;
   media_url: string | null;
   created_at: string;
+  is_pinned: boolean;
 }
 
 interface Community {
@@ -48,6 +49,7 @@ const CommunityChat = () => {
 
   const [community, setCommunity] = useState<Community | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [pinnedMessages, setPinnedMessages] = useState<Message[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,8 @@ const CommunityChat = () => {
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [newCommunityName, setNewCommunityName] = useState("");
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
+  const [memberToPromote, setMemberToPromote] = useState<Member | null>(null);
+  const [showPinnedMessages, setShowPinnedMessages] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -83,6 +87,31 @@ const CommunityChat = () => {
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => [...prev, newMsg]);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "community_messages",
+          filter: `community_id=eq.${communityId}`,
+        },
+        (payload) => {
+          const updatedMsg = payload.new as Message;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === updatedMsg.id ? updatedMsg : m))
+          );
+          if (updatedMsg.is_pinned) {
+            setPinnedMessages((prev) => {
+              if (!prev.find((m) => m.id === updatedMsg.id)) {
+                return [...prev, updatedMsg];
+              }
+              return prev;
+            });
+          } else {
+            setPinnedMessages((prev) => prev.filter((m) => m.id !== updatedMsg.id));
+          }
         }
       )
       .subscribe();
@@ -135,7 +164,9 @@ const CommunityChat = () => {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      const allMessages = (data || []) as Message[];
+      setMessages(allMessages);
+      setPinnedMessages(allMessages.filter((m) => m.is_pinned));
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
@@ -274,6 +305,38 @@ const CommunityChat = () => {
     }
   };
 
+  const handleTransferAdmin = async () => {
+    if (!memberToPromote) return;
+
+    try {
+      // Make the selected member an admin
+      const { error: promoteError } = await supabase
+        .from("community_members")
+        .update({ role: "admin" })
+        .eq("community_id", communityId)
+        .eq("user_id", memberToPromote.user_id);
+
+      if (promoteError) throw promoteError;
+
+      // Demote current admin to member
+      const { error: demoteError } = await supabase
+        .from("community_members")
+        .update({ role: "member" })
+        .eq("community_id", communityId)
+        .eq("user_id", user?.id);
+
+      if (demoteError) throw demoteError;
+
+      toast.success(`Admin role transferred to ${memberToPromote.username}`);
+      setMemberToPromote(null);
+      setIsAdmin(false);
+      fetchMembers();
+    } catch (error: any) {
+      console.error("Error transferring admin:", error);
+      toast.error("Failed to transfer admin role");
+    }
+  };
+
   const handleRenameCommunity = async () => {
     if (!newCommunityName.trim()) {
       toast.error("Please enter a community name");
@@ -294,6 +357,22 @@ const CommunityChat = () => {
     } catch (error: any) {
       console.error("Error renaming community:", error);
       toast.error("Failed to rename community");
+    }
+  };
+
+  const handlePinMessage = async (messageId: string, isPinned: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("community_messages")
+        .update({ is_pinned: !isPinned })
+        .eq("id", messageId);
+
+      if (error) throw error;
+
+      toast.success(isPinned ? "Message unpinned" : "Message pinned");
+    } catch (error: any) {
+      console.error("Error pinning message:", error);
+      toast.error("Failed to pin message");
     }
   };
 
@@ -408,19 +487,33 @@ const CommunityChat = () => {
                         <div className="flex-1">
                           <p className="text-sm font-medium">{member.username}</p>
                           {member.role === "admin" && (
-                            <span className="text-xs text-primary">Admin</span>
+                            <span className="text-xs text-primary flex items-center gap-1">
+                              <Crown className="h-3 w-3" /> Admin
+                            </span>
                           )}
                         </div>
-                        {/* Admin can remove members (except themselves) */}
+                        {/* Admin controls for other members */}
                         {isAdmin && member.user_id !== user?.id && member.role !== "admin" && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() => setMemberToRemove(member)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-primary hover:text-primary"
+                              onClick={() => setMemberToPromote(member)}
+                              title="Transfer admin role"
+                            >
+                              <Shield className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              onClick={() => setMemberToRemove(member)}
+                              title="Remove member"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -438,7 +531,8 @@ const CommunityChat = () => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Leave Community?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to leave {community?.name}? You can rejoin later using the invite code.
+                        Are you sure you want to leave {community?.name}? 
+                        {isAdmin && " As the admin, you should transfer admin role to another member first."}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -455,6 +549,59 @@ const CommunityChat = () => {
         </div>
       </div>
 
+      {/* Pinned Messages Section */}
+      {pinnedMessages.length > 0 && (
+        <div className="border-b bg-muted/30">
+          <button
+            onClick={() => setShowPinnedMessages(!showPinnedMessages)}
+            className="w-full px-4 py-2 flex items-center justify-between text-sm font-medium"
+          >
+            <span className="flex items-center gap-2">
+              <Pin className="h-4 w-4 text-primary" />
+              Pinned Messages ({pinnedMessages.length})
+            </span>
+            <span className="text-muted-foreground">
+              {showPinnedMessages ? "Hide" : "Show"}
+            </span>
+          </button>
+          {showPinnedMessages && (
+            <div className="px-4 pb-3 space-y-2">
+              {pinnedMessages.map((message) => (
+                <div
+                  key={message.id}
+                  className="bg-background rounded-lg p-3 border border-primary/20"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-primary">{message.sender_username}</p>
+                      {message.content_type === "image" && message.media_url ? (
+                        <img
+                          src={message.media_url}
+                          alt="Pinned image"
+                          className="rounded-lg max-w-full max-h-32 object-cover mt-1"
+                        />
+                      ) : (
+                        <p className="text-sm mt-1">{message.content}</p>
+                      )}
+                    </div>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0"
+                        onClick={() => handlePinMessage(message.id, true)}
+                      >
+                        <PinOff className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
@@ -467,7 +614,7 @@ const CommunityChat = () => {
             return (
               <div
                 key={message.id}
-                className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
               >
                 <div className={`flex gap-2 max-w-[80%] ${isOwn ? "flex-row-reverse" : ""}`}>
                   {!isOwn && (
@@ -477,7 +624,7 @@ const CommunityChat = () => {
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div>
+                  <div className="relative">
                     {!isOwn && (
                       <p className="text-xs text-muted-foreground mb-1 ml-1">
                         {message.sender_username}
@@ -488,8 +635,11 @@ const CommunityChat = () => {
                         isOwn
                           ? "bg-primary text-primary-foreground rounded-br-md"
                           : "bg-muted rounded-bl-md"
-                      }`}
+                      } ${message.is_pinned ? "ring-2 ring-primary/30" : ""}`}
                     >
+                      {message.is_pinned && (
+                        <Pin className="h-3 w-3 inline-block mr-1 opacity-70" />
+                      )}
                       {message.content_type === "image" && message.media_url ? (
                         <img
                           src={message.media_url}
@@ -500,9 +650,25 @@ const CommunityChat = () => {
                         <p className="text-sm">{message.content}</p>
                       )}
                     </div>
-                    <p className={`text-xs text-muted-foreground mt-1 ${isOwn ? "text-right" : ""}`}>
-                      {format(new Date(message.created_at), "HH:mm")}
-                    </p>
+                    <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : ""}`}>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(message.created_at), "HH:mm")}
+                      </p>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handlePinMessage(message.id, message.is_pinned)}
+                        >
+                          {message.is_pinned ? (
+                            <PinOff className="h-3 w-3" />
+                          ) : (
+                            <Pin className="h-3 w-3" />
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -582,6 +748,24 @@ const CommunityChat = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleRemoveMember} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Transfer Admin Dialog */}
+      <AlertDialog open={!!memberToPromote} onOpenChange={() => setMemberToPromote(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Transfer Admin Role?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to make {memberToPromote?.username} the admin? You will become a regular member and lose admin privileges.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleTransferAdmin}>
+              Transfer Admin
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
