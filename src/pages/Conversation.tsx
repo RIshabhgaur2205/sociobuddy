@@ -205,16 +205,6 @@ const Conversation = () => {
           inputRef.current?.focus();
         }, 10);
 
-        if (matchedProfile) {
-          supabase.functions.invoke("send-push-notification", {
-            body: {
-              userId: matchedProfile.id,
-              title: "New message",
-              body: contentType === 'image' ? "📷 Sent an image" : content.substring(0, 100),
-              url: `/conversation/${matchId}`,
-            },
-          }).catch(console.error);
-        }
       }
     } catch (err) {
       console.error(err);
@@ -307,16 +297,6 @@ const Conversation = () => {
 
     if (error) {
       showToast({ title: "Failed to send voice note", variant: "destructive" });
-    } else if (matchedProfile) {
-      supabase.functions.invoke("send-push-notification", {
-        body: {
-          userId: matchedProfile.id,
-          title: "New message",
-          body: "🎤 Sent a voice note",
-          url: `/conversation/${matchId}`,
-        },
-      }).catch(console.error);
-    }
 
     setSending(false);
   };
