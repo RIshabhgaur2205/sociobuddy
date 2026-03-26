@@ -30,10 +30,10 @@ const Hero = () => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(120_100%_45%/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(120_100%_45%/0.05)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
       
       <div className="container relative mx-auto px-4 pt-28 pb-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div className="space-y-6">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] animate-fade-in uppercase tracking-tight">
+            <h1 className="font-display text-4xl md:text-5xl font-extrabold leading-[1.1] animate-fade-in uppercase tracking-tight">
               <span className="text-gradient-animated">SocioBuddy.in:</span>
               <span className="block text-foreground mt-1">Your Digital</span>
               <span className="block text-foreground">Wingman.</span>
