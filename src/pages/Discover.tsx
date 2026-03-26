@@ -184,14 +184,6 @@ const Discover = () => {
 
       toast.success("💜 Connection request sent!");
       
-      supabase.functions.invoke("send-push-notification", {
-        body: {
-          userId: profileId,
-          title: "New connection request!",
-          body: "Someone wants to connect with you 💜",
-          url: "/matches",
-        },
-      }).catch(console.error);
       
       setTimeout(() => {
         nextProfile();
