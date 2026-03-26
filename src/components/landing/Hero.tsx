@@ -82,7 +82,7 @@ const Hero = () => {
                 <img 
                   src={heroImage} 
                   alt="Two teens doing a fist bump in gaming style" 
-                  className="w-full object-cover" 
+                  className="w-full max-h-[400px] object-cover object-top" 
                   width={1024}
                   height={1024}
                 />
