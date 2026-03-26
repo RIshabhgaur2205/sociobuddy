@@ -297,7 +297,7 @@ const Conversation = () => {
 
     if (error) {
       showToast({ title: "Failed to send voice note", variant: "destructive" });
-
+    }
     setSending(false);
   };
 
