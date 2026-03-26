@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-coral-dark hover:scale-105 shadow-soft hover:shadow-glow",
+        default: "bg-primary text-primary-foreground hover:bg-primary/80 hover:scale-105 shadow-soft hover:shadow-glow",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-teal-light hover:scale-105 shadow-soft",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-105 shadow-soft",
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-primary text-primary-foreground hover:bg-coral-dark hover:scale-105 shadow-glow text-base",
-        "hero-outline": "border-2 border-primary/20 bg-card/80 backdrop-blur-sm text-foreground hover:border-primary hover:bg-card text-base",
-        cta: "gradient-cta text-secondary-foreground hover:scale-105 shadow-soft text-base",
+        hero: "bg-primary text-primary-foreground hover:bg-primary/80 hover:scale-105 shadow-neon text-base",
+        "hero-outline": "border-2 border-primary/30 bg-card/80 backdrop-blur-sm text-foreground hover:border-primary hover:bg-card text-base",
+        cta: "gradient-cta text-primary-foreground hover:scale-105 shadow-soft text-base",
       },
       size: {
         default: "h-11 px-6 py-2",

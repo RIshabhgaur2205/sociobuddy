@@ -28,35 +28,35 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-primary/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="SocioBuddy Logo" className="w-10 h-10 rounded-xl object-cover" />
-            <span className="text-xl font-extrabold text-foreground">SocioBuddy</span>
+            <span className="text-xl font-extrabold text-foreground">SocioBuddy<span className="text-primary">.in</span></span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <a href="/#how-it-works" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               How It Works
             </a>
-            <a href="/#features" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <a href="/#features" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Features
             </a>
-            <a href="/#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <a href="/#testimonials" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Stories
             </a>
-            <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
+            <Link to="/mentors" className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1">
               <GraduationCap className="h-4 w-4" />
               Mentors
             </Link>
-            <Link to="/communities" className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-1">
+            <Link to="/communities" className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1">
               <Users className="h-4 w-4" />
               Communities
             </Link>
-            <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Pricing
             </Link>
           </div>
@@ -120,7 +120,7 @@ const Navbar = () => {
                   <Button variant="ghost">Log In</Button>
                 </Link>
                 <Link to="/auth">
-                  <Button>Join Now</Button>
+                  <Button className="shadow-neon">Get Started</Button>
                 </Link>
               </>
             )}
@@ -128,10 +128,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
-            <button
-              className="p-2"
-              onClick={() => setIsOpen(!isOpen)}
-            >
+            <button className="p-2" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -139,38 +136,38 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border/50">
+          <div className="md:hidden py-4 border-t border-primary/10">
             <div className="flex flex-col gap-4">
-              <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+              <a href="/#how-it-works" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                 How It Works
               </a>
-              <a href="/#features" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+              <a href="/#features" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                 Features
               </a>
-              <a href="/#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+              <a href="/#testimonials" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                 Stories
               </a>
-              <Link to="/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
+              <Link to="/mentors" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
                 Mentors
               </Link>
-              <Link to="/communities" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 flex items-center gap-2">
+              <Link to="/communities" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Communities
               </Link>
-              <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+              <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                 Pricing
               </Link>
 
               {user ? (
                 <>
-                  <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                  <Link to="/discover" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                     Discover
                   </Link>
-                  <Link to="/matches" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                  <Link to="/matches" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                     My Matches
                   </Link>
-                  <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2">
+                  <Link to="/profile" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2">
                     Profile
                   </Link>
                   {isAdmin && (
@@ -181,18 +178,18 @@ const Navbar = () => {
                           Admin
                         </span>
                       </div>
-                      <Link to="/admin/mentors" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                      <Link to="/admin/mentors" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2 pl-2">
                         Mentor Applications
                       </Link>
-                      <Link to="/admin/users" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                      <Link to="/admin/users" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2 pl-2">
                         User Management
                       </Link>
-                      <Link to="/admin/referral-codes" className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 pl-2">
+                      <Link to="/admin/referral-codes" className="text-muted-foreground hover:text-primary transition-colors font-medium py-2 pl-2">
                         Referral Codes
                       </Link>
                     </>
                   )}
-                  <div className="pt-4 border-t border-border/50">
+                  <div className="pt-4 border-t border-primary/10">
                     <Button variant="outline" className="w-full" onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
@@ -200,12 +197,12 @@ const Navbar = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex gap-4 pt-4 border-t border-border/50">
+                <div className="flex gap-4 pt-4 border-t border-primary/10">
                   <Link to="/auth" className="flex-1">
                     <Button variant="ghost" className="w-full">Log In</Button>
                   </Link>
                   <Link to="/auth" className="flex-1">
-                    <Button className="w-full">Join Now</Button>
+                    <Button className="w-full shadow-neon">Get Started</Button>
                   </Link>
                 </div>
               )}
