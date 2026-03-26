@@ -8,6 +8,7 @@ import { Mail, Lock, User, ArrowLeft, Sparkles, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import logo from "@/assets/logo.jpeg";
 import { z } from "zod";
 import {
