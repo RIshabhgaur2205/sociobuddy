@@ -6,12 +6,7 @@ import { MessageCircle, Check, X, ArrowLeft, User, Sparkles, Heart, MapPin, Grad
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import ProfileDetailDialog from "@/components/profile/ProfileDetailDialog";
 
 interface MatchWithProfile {
   id: string;
