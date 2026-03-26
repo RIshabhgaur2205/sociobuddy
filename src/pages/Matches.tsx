@@ -332,97 +332,20 @@ const Matches = () => {
       </div>
 
       {/* User Profile Dialog */}
-      <Dialog open={!!selectedProfile} onOpenChange={() => setSelectedProfile(null)}>
-        <DialogContent className="sm:max-w-md mx-4 rounded-3xl border-0 shadow-2xl p-0 overflow-hidden">
-          {selectedProfile?.profile && (
-            <>
-              {/* Header with gradient */}
-              <div className="h-24 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 relative">
-                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
-                  {renderAvatar(selectedProfile.profile, "lg")}
-                </div>
-              </div>
-              
-              <div className="pt-16 pb-6 px-6 text-center">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-gray-900">
-                    {selectedProfile.profile.username}
-                  </DialogTitle>
-                </DialogHeader>
-                
-                {selectedProfile.profile.school && (
-                  <p className="text-gray-500 text-sm mt-1 flex items-center justify-center gap-1">
-                    <GraduationCap className="h-4 w-4" />
-                    {selectedProfile.profile.school}
-                  </p>
-                )}
-                
-                {/* Match Score */}
-                <div className="mt-4 inline-flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-full">
-                  <Heart className="h-4 w-4 text-pink-500" />
-                  <span className="text-sm font-semibold text-pink-600">
-                    {selectedProfile.compatibility_score}% Compatible
-                  </span>
-                </div>
-                
-                {/* Bio */}
-                {selectedProfile.profile.bio && (
-                  <p className="mt-4 text-gray-600 text-sm leading-relaxed">
-                    {selectedProfile.profile.bio}
-                  </p>
-                )}
-                
-                {/* Interests */}
-                {selectedProfile.profile.interests && selectedProfile.profile.interests.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Interests</p>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {selectedProfile.profile.interests.map((interest) => (
-                        <span
-                          key={interest}
-                          className="text-xs bg-gradient-to-r from-pink-50 to-purple-50 text-purple-600 px-3 py-1.5 rounded-full font-medium border border-purple-100"
-                        >
-                          {interest}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Actions */}
-                <div className="mt-6 flex gap-3 justify-center">
-                  {selectedProfile.status === "pending" ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={(e) => handleReject(selectedProfile.id, e)}
-                        className="rounded-full px-6 border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
-                      >
-                        <X className="h-4 w-4 mr-1.5" />
-                        Decline
-                      </Button>
-                      <Button
-                        onClick={(e) => handleAccept(selectedProfile.id, e)}
-                        className="rounded-full px-6 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-                      >
-                        <Check className="h-4 w-4 mr-1.5" />
-                        Accept
-                      </Button>
-                    </>
-                  ) : (
-                    <Link to={`/conversation/${selectedProfile.id}`}>
-                      <Button className="rounded-full px-8 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
-                        <MessageCircle className="h-4 w-4 mr-1.5" />
-                        Start Chat
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ProfileDetailDialog
+        open={!!selectedProfile}
+        onOpenChange={() => setSelectedProfile(null)}
+        profile={selectedProfile?.profile ? {
+          ...selectedProfile.profile,
+          age: null,
+          looking_for: null,
+        } : null}
+        matchId={selectedProfile?.id || ""}
+        matchStatus={selectedProfile?.status || ""}
+        compatibilityScore={selectedProfile?.compatibility_score || 0}
+        onAccept={(id) => handleAccept(id)}
+        onReject={(id) => handleReject(id)}
+      />
     </>
   );
 };
