@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <img src={logo} alt="SocioBuddy Logo" className="w-10 h-10 rounded-xl object-cover" />
-              <span className="text-xl font-extrabold text-foreground">SocioBuddy<span className="text-primary">.in</span></span>
+              <span className="text-xl font-extrabold text-foreground">SocioBuddy</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Helping teenagers overcome social anxiety and build meaningful friendships since 2024.
