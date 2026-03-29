@@ -34,7 +34,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="SocioBuddy Logo" className="w-10 h-10 rounded-xl object-cover" />
-            <span className="text-xl font-extrabold text-foreground">SocioBuddy<span className="text-primary">.in</span></span>
+            <span className="text-xl font-extrabold text-foreground">SocioBuddy</span>
           </Link>
 
           {/* Desktop Navigation */}
