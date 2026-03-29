@@ -6,7 +6,7 @@ import heroImage from "@/assets/hero-gaming.png";
 const features = [
   { icon: Gamepad2, label: "Life Cheat Codes", path: "/social-cheat-codes" },
   { icon: MessageSquare, label: "Social Gym", path: "/social-gym" },
-  { icon: AlertTriangle, label: "SOS Panic Room", path: "/discover" },
+  { icon: AlertTriangle, label: "SOS Panic Room", path: "/sos-panic-room" },
   { icon: Users, label: "Community", path: "/communities" },
   { icon: ShieldCheck, label: "Mentor Support", path: "/mentors" },
 ];

@@ -7,6 +7,7 @@ import SocialGymSection from "@/components/landing/SocialGymSection";
 import Features from "@/components/landing/Features";
 import Testimonials from "@/components/landing/Testimonials";
 import CTA from "@/components/landing/CTA";
+import SOSPanicSection from "@/components/landing/SOSPanicSection";
 import Footer from "@/components/landing/Footer";
 
 const Index = () => {
@@ -34,6 +35,9 @@ const Index = () => {
           </section>
           <section id="social-gym">
             <SocialGymSection />
+          </section>
+          <section id="sos-panic-room">
+            <SOSPanicSection />
           </section>
           <section id="features">
             <Features />
