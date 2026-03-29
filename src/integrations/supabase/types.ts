@@ -454,6 +454,39 @@ export type Database = {
         }
         Relationships: []
       }
+      social_gym_stats: {
+        Row: {
+          badges: string[]
+          characters_tried: string[]
+          created_at: string
+          id: string
+          sessions_completed: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badges?: string[]
+          characters_tried?: string[]
+          created_at?: string
+          id?: string
+          sessions_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badges?: string[]
+          characters_tried?: string[]
+          created_at?: string
+          id?: string
+          sessions_completed?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           created_at: string
