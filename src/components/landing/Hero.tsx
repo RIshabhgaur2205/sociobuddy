@@ -34,7 +34,7 @@ const Hero = () => {
           {/* Left content */}
           <div className="space-y-6">
             <h1 className="font-display text-4xl md:text-5xl font-extrabold leading-[1.1] animate-fade-in uppercase tracking-tight">
-              <span className="text-gradient-animated">SocioBuddy.in:</span>
+              <span className="text-gradient-animated">SocioBuddy:</span>
               <span className="block text-foreground mt-1">Your Digital</span>
               <span className="block text-foreground">Wingman.</span>
             </h1>
@@ -45,7 +45,7 @@ const Hero = () => {
             </h2>
             
             <p className="text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Feeling Stuck? SocioBuddy.in is Where Your People Live. Connect, Chill, 
+              Feeling Stuck? SocioBuddy is Where Your People Live. Connect, Chill, 
               & Grow—Exactly What You Need. We're the community for Teens where 
               you find support, life cheat codes, and your vibe. Join thousands 
               building confidence and real friendships.
