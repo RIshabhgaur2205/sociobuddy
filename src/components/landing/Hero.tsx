@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-gaming.png";
 
 const features = [
-  { icon: Gamepad2, label: "Life Cheat Codes" },
-  { icon: MessageSquare, label: "Social Gym" },
-  { icon: AlertTriangle, label: "SOS Panic Room" },
-  { icon: Users, label: "Community" },
-  { icon: ShieldCheck, label: "Mentor Support" },
+  { icon: Gamepad2, label: "Life Cheat Codes", path: "/social-cheat-codes" },
+  { icon: MessageSquare, label: "Social Gym", path: "/social-gym" },
+  { icon: AlertTriangle, label: "SOS Panic Room", path: "/discover" },
+  { icon: Users, label: "Community", path: "/communities" },
+  { icon: ShieldCheck, label: "Mentor Support", path: "/mentors" },
 ];
 
 const Hero = () => {
@@ -97,6 +97,7 @@ const Hero = () => {
           {features.map((feature, index) => (
             <div 
               key={index}
+              onClick={() => navigate(feature.path)}
               className="neon-border rounded-2xl p-4 md:p-6 flex flex-col items-center gap-3 bg-card/50 hover:bg-card/80 transition-all duration-300 hover:scale-105 cursor-pointer group"
             >
               <feature.icon className="h-8 w-8 text-primary group-hover:drop-shadow-[0_0_8px_hsl(120_100%_50%/0.8)] transition-all" />
