@@ -27,6 +27,8 @@ import AdminMentors from "./pages/AdminMentors";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReferralCodes from "./pages/AdminReferralCodes";
 import NotFound from "./pages/NotFound";
+import SocialCheatCodes from "./pages/SocialCheatCodes";
+import SocialGym from "./pages/SocialGym";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,8 @@ const App = () => (
               <Route path="/admin/mentors" element={<AdminMentors />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/referral-codes" element={<AdminReferralCodes />} />
+              <Route path="/social-cheat-codes" element={<SocialCheatCodes />} />
+              <Route path="/social-gym" element={<SocialGym />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
